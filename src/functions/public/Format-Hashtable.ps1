@@ -45,6 +45,7 @@
         .LINK
         https://psmodule.io/Format/Functions/Format-Hashtable
     #>
+    [OutputType([string])]
     [CmdletBinding()]
     param (
         # The hashtable to convert to a PowerShell code representation.

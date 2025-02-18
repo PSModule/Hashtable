@@ -1,36 +1,57 @@
 ﻿filter ConvertTo-Hashtable {
     <#
-    .SYNOPSIS
-    Converts an object to a hashtable.
+        .SYNOPSIS
+        Converts an object to a hashtable.
 
-    .DESCRIPTION
-    Recursively converts an object to a hashtable. This function is useful for converting complex objects
-    to hashtables for serialization or other purposes.
+        .DESCRIPTION
+        Recursively converts an object to a hashtable. This function is useful for converting complex objects
+        to hashtables for serialization or other purposes.
 
-    .EXAMPLE
-    $object = [PSCustomObject]@{
-        Name        = 'John Doe'
-        Age         = 30
-        Address     = [PSCustomObject]@{
-            Street  = '123 Main St'
-            City    = 'Somewhere'
-            ZipCode = '12345'
-        }
-        Occupations = @(
-            [PSCustomObject]@{
-                Title   = 'Developer'
-                Company = 'TechCorp'
-            },
-            [PSCustomObject]@{
-                Title   = 'Consultant'
-                Company = 'ConsultCorp'
+        .EXAMPLE
+        $object = [PSCustomObject]@{
+            Name        = 'John Doe'
+            Age         = 30
+            Address     = [PSCustomObject]@{
+                Street  = '123 Main St'
+                City    = 'Somewhere'
+                ZipCode = '12345'
             }
-        )
-    }
-    $hashtable = ConvertTo-Hashtable -InputObject $object
+            Occupations = @(
+                [PSCustomObject]@{
+                    Title   = 'Developer'
+                    Company = 'TechCorp'
+                },
+                [PSCustomObject]@{
+                    Title   = 'Consultant'
+                    Company = 'ConsultCorp'
+                }
+            )
+        }
+        ConvertTo-Hashtable -InputObject $object
 
-    This will return a hashtable representation of the object.
+        Output:
+        ```powershell
+        Name                           Value
+        ----                           -----
+        Age                            30
+        Address                        {[ZipCode, 12345], [City, Somewhere], [Street, 123 Main St]}
+        Name                           John Doe
+        Occupations                    {@{Title=Developer; Company=TechCorp}, @{Title=Consultant; Company=ConsultCorp}}
+        ```
+
+        This returns a hashtable representation of the object.
+
+        .OUTPUTS
+        hashtable
+
+        .NOTES
+        The function returns a hashtable representation of the input object,
+        converting complex nested structures recursively.
+
+        .LINK
+        https://psmodule.io/ConvertTo/Functions/ConvertTo-Hashtable
     #>
+    [OutputType([hashtable])]
     [CmdletBinding()]
     param (
         # The object to convert to a hashtable.
@@ -53,7 +74,7 @@
                 # Handle arrays and enumerables
                 $hashtable[$propertyName] = @()
                 foreach ($item in $propertyValue) {
-                    $hashtable[$propertyName] += ConvertTo-HashTable -InputObject $item
+                    $hashtable[$propertyName] += ConvertTo-Hashtable -InputObject $item
                 }
             } elseif ($propertyValue.PSObject.Properties.Count -gt 0) {
                 # Handle nested objects
