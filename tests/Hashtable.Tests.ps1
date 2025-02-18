@@ -275,11 +275,11 @@
                 $ht = @{
                     Key4 = $true
                 }
-                $expected = @"
+                $expected = @'
 @{
     Key4 = $true
 }
-"@.TrimEnd()
+'@.TrimEnd()
 
                 $result = Format-Hashtable -Hashtable $ht
                 $result | Should -Be $expected
@@ -294,7 +294,7 @@
                 # Note: The function replaces one or more single quotes with two single quotes.
                 $expected = @'
 @{
-    Key5 = "O'Reilly"
+    Key5 = 'O''Reilly'
 }
 '@.TrimEnd()
 
@@ -340,7 +340,7 @@
                 $formatted = Format-Hashtable -Hashtable $testHashtable
 
                 # Assert - Define the expected output
-                $expectedOutput = @"
+                $expectedOutput = @'
 @{
     StringKey = 'Hello ''PowerShell''!'
     NumberKey = 42
@@ -348,7 +348,7 @@
     ArrayKey = @(
         'FirstItem'
         123
-        `$false
+        $false
         @(
             'NestedArray1'
             'NestedArray2'
@@ -374,7 +374,7 @@
         )
     }
 }
-"@.Trim() # Trim to remove any unintended whitespace
+'@.Trim() # Trim to remove any unintended whitespace
 
                 # Compare function output to expected output
                 $formatted | Should -BeExactly $expectedOutput
