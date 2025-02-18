@@ -69,7 +69,8 @@
         [string[]] $KeepKeys
     )
 
-    foreach ($key in $Hashtable.Keys) {
+    $keys = $Hashtable.Keys
+    foreach ($key in $keys) {
         $value = $Hashtable[$key]
         $valueIsNotNullOrEmpty = -not [string]::IsNullOrEmpty($value)
         $typeName = if ($valueIsNotNullOrEmpty) { $value.GetType().Name } else { $null }
