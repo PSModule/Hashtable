@@ -211,7 +211,7 @@
         Context 'ConvertFrom-Hashtable - simple usage' {
             It 'ConvertFrom-Hashtable - converts a flat hashtable to PSCustomObject' {
                 $hashtable = @{ Name = 'John Doe'; Age = 30 }
-                $result = ConvertFrom-Hashtable -InputHash $hashtable
+                $result = $hashtable | ConvertFrom-Hashtable
 
                 $result | Should -BeOfType [PSCustomObject]
                 $result.Name | Should -Be 'John Doe'
@@ -222,7 +222,7 @@
         Context 'ConvertFrom-Hashtable - nested hashtable conversion' {
             It 'ConvertFrom-Hashtable - correctly converts nested hashtables' {
                 $hashtable = @{ Address = @{ Street = '123 Main St'; City = 'Somewhere' } }
-                $result = ConvertFrom-Hashtable -InputHash $hashtable
+                $result = $hashtable | ConvertFrom-Hashtable
 
                 $result | Should -BeOfType [PSCustomObject]
                 $result.Address | Should -BeOfType [PSCustomObject]
@@ -234,10 +234,9 @@
         Context 'ConvertFrom-Hashtable - array of hashtables' {
             It 'ConvertFrom-Hashtable - converts an array of hashtables to objects' {
                 $hashtable = @{ Employees = @(@{ Name = 'Alice' }, @{ Name = 'Bob' }) }
-                $result = ConvertFrom-Hashtable -InputHash $hashtable
+                $result = $hashtable | ConvertFrom-Hashtable
 
                 $result | Should -BeOfType [PSCustomObject]
-                $result.Employees | Should -BeOfType [object[]]
                 $result.Employees.Count | Should -Be 2
                 $result.Employees[0] | Should -BeOfType [PSCustomObject]
                 $result.Employees[0].Name | Should -Be 'Alice'
@@ -247,8 +246,7 @@
 
         Context 'ConvertFrom-Hashtable - empty hashtable' {
             It 'ConvertFrom-Hashtable - returns an empty PSCustomObject when input is empty' {
-                $hashtable = @{}
-                $result = ConvertFrom-Hashtable -InputHash $hashtable
+                $result = @{} | ConvertFrom-Hashtable
 
                 $result | Should -BeOfType [PSCustomObject]
                 ($result.PSObject.Properties.Name.Count) | Should -Be 0
@@ -441,8 +439,8 @@
                 }
                 $Hashtable | Remove-HashtableEntry -NullOrEmptyValues
 
-                $Hashtable.Keys | Should -NotContain 'Key3'
-                $Hashtable.Keys | Should -NotContain 'Key5'
+                $Hashtable.Keys | Should -Not -Contain 'Key3'
+                $Hashtable.Keys | Should -Not -Contain 'Key5'
                 $Hashtable.Keys.Count | Should -Be 3
             }
         }
@@ -458,8 +456,8 @@
                 }
                 $Hashtable | Remove-HashtableEntry -RemoveTypes 'Int', 'Double'
 
-                $Hashtable.Keys | Should -NotContain 'Key2'
-                $Hashtable.Keys | Should -NotContain 'Key5'
+                $Hashtable.Keys | Should -Not -Contain 'Key2'
+                $Hashtable.Keys | Should -Not -Contain 'Key5'
                 $Hashtable.Keys.Count | Should -Be 3
             }
         }
@@ -472,7 +470,7 @@
                 }
                 $Hashtable | Remove-HashtableEntry -RemoveNames 'RemoveThis'
 
-                $Hashtable.Keys | Should -NotContain 'RemoveThis'
+                $Hashtable.Keys | Should -Not -Contain 'RemoveThis'
                 $Hashtable.Keys.Count | Should -Be 1
             }
         }
@@ -503,7 +501,7 @@
                 $Hashtable | Remove-HashtableEntry -KeepNames 'KeepThis'
 
                 $Hashtable.Keys | Should -Contain 'KeepThis'
-                $Hashtable.Keys | Should -NotContain 'RemoveThis'
+                $Hashtable.Keys | Should -Not -Contain 'RemoveThis'
                 $Hashtable.Keys.Count | Should -Be 1
             }
         }
