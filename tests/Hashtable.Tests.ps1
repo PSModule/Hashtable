@@ -316,7 +316,7 @@
                         123
                         $false
                         @('NestedArray1', 'NestedArray2')
-                        @{
+                        [ordered]@{
                             NestedHashtableKey1 = 'NestedValue1'
                             NestedHashtableKey2 = @(
                                 @{ DeepNestedKey = 'DeepValue' }
@@ -344,7 +344,7 @@
 @{
     StringKey = 'Hello ''PowerShell''!'
     NumberKey = 42
-    BooleanKey = `$true
+    BooleanKey = $true
     ArrayKey = @(
         'FirstItem'
         123
