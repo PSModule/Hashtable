@@ -58,7 +58,7 @@
 
         # The indentation level for formatting nested structures.
         [Parameter()]
-        [int] $IndentLevel = 0
+        [int] $IndentLevel = 1
     )
 
     $lines = @()
@@ -76,23 +76,23 @@
         Write-Verbose "Value type: $($value.GetType().Name)"
         if (($value -is [System.Collections.Hashtable]) -or ($value -is [System.Collections.Specialized.OrderedDictionary])) {
             $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
-            $lines += "$indent    $key = $nestedString"
+            $lines += "$indent$key = $nestedString"
         } elseif ($value -is [System.Management.Automation.PSCustomObject]) {
             $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
-            $lines += "$indent    $key = $nestedString"
+            $lines += "$indent$key = $nestedString"
         } elseif ($value -is [System.Management.Automation.PSObject]) {
             $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
-            $lines += "$indent    $key = $nestedString"
+            $lines += "$indent$key = $nestedString"
         } elseif ($value -is [bool]) {
             $lines += "$indent    $key = `$$($value.ToString().ToLower())"
         } elseif ($value -is [int]) {
-            $lines += "$indent    $key = $value"
+            $lines += "$indent$key = $value"
         } elseif ($value -is [array]) {
             if ($value.Count -eq 0) {
-                $lines += "$indent    $key = @()"
+                $lines += "$indent$key = @()"
             } else {
-                $lines += "$indent    $key = @("
-                $arrayIndent = "$indent        "  # Increase indentation for elements inside @(...)
+                $lines += "$indent$key = @("
+                $arrayIndent = "$indent    "  # Increase indentation for elements inside @(...)
 
                 $value | ForEach-Object {
                     $nestedValue = $_
@@ -109,11 +109,11 @@
                         $lines += "$arrayIndent'$nestedValue'"
                     }
                 }
-                $lines += "$indent    )"
+                $lines += "$indent)"
             }
         } else {
             $value = $value -replace "('+)", "''" # Escape single quotes in a manifest file
-            $lines += "$indent    $key = '$value'"
+            $lines += "$indent$key = '$value'"
         }
     }
 
