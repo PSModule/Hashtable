@@ -7,22 +7,22 @@
         Merge two hashtables, with the second hashtable overriding the first
 
         .EXAMPLE
-        $Main = [ordered]@{
+        $Main = @{
             Action   = ''
             Location = 'Main'
             Name     = 'Main'
             Mode     = 'Main'
         }
-        $Override1 = [ordered]@{
+        $Override1 = @{
             Action   = ''
             Location = ''
             Name     = 'Override1'
             Mode     = 'Override1'
         }
-        $Override2 = [ordered]@{
+        $Override2 = @{
             Action   = ''
             Location = ''
-            Name     = 'Override1'
+            Name     = ''
             Mode     = 'Override2'
         }
         Merge-Hashtables -Main $Main -Overrides $Override1, $Override2
@@ -47,7 +47,7 @@
             if (($Output.Keys) -notcontains $Key) {
                 $Output.$Key = $Override.$Key
             }
-            if ($Override.item($Key) | IsNotNullOrEmpty) {
+            if (-not [string]::IsNullOrEmpty($Override.item($Key))) {
                 $Output.$Key = $Override.$Key
             }
         }

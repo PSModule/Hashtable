@@ -31,6 +31,7 @@
 
     This will return a hashtable representation of the object.
     #>
+    [CmdletBinding()]
     param (
         # The object to convert to a hashtable.
         [Parameter(
