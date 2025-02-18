@@ -85,7 +85,7 @@
             $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
             $lines += "$levelIndent$key = $nestedString"
         } elseif ($value -is [bool]) {
-            $lines += "$indent    $key = `$$($value.ToString().ToLower())"
+            $lines += "$levelIndent$key = `$$($value.ToString().ToLower())"
         } elseif ($value -is [int]) {
             $lines += "$levelIndent$key = $value"
         } elseif ($value -is [array]) {
