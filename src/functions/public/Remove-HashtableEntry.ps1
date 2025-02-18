@@ -88,25 +88,19 @@
 
         if ($KeepKeys -and $key -in $KeepKeys) {
             Write-Debug "Keeping [$key] because it is in KeepKeys [$KeepKeys]."
-            continue
         } elseif ($KeepTypes -and $typeName -in $KeepTypes) {
             Write-Debug "Keeping [$key] because its type [$typeName] is in KeepTypes [$KeepTypes]."
-            continue
         } elseif ($vaultIsNullOrEmpty -and $KeepNullOrEmptyValues) {
             Write-Debug "Keeping [$key] because its value is null or empty."
-            continue
         } elseif ($vaultIsNullOrEmpty -and $NullOrEmptyValues) {
             Write-Debug "Removing [$key] because its value is null or empty."
             $Hashtable.Remove($key)
-            continue
         } elseif ($Types -and $typeName -in $Types) {
             Write-Debug "Removing [$key] because its type [$typeName] is in RemoveTypes [$Types]."
             $Hashtable.Remove($key)
-            continue
         } elseif ($Keys -and $key -in $Keys) {
             Write-Debug "Removing [$key] because it is in RemoveKeys [$Keys]."
             $Hashtable.Remove($key)
-            continue
         } elseif ($All) {
             Write-Debug "Removing [$key] because All flag is set."
             $Hashtable.Remove($key)
