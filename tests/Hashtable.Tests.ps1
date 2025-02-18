@@ -349,10 +349,8 @@
         'FirstItem'
         123
         $false
-        @(
-            'NestedArray1'
-            'NestedArray2'
-        )
+        'NestedArray1'
+        'NestedArray2'
         @{
             NestedHashtableKey1 = 'NestedValue1'
             NestedHashtableKey2 = @(
