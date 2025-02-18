@@ -88,5 +88,5 @@
         }
     }
 
-    return $hashtable
+    $hashtable
 }

@@ -4,94 +4,45 @@
         Removes specific entries from a hashtable based on value, type, or name.
 
         .DESCRIPTION
-        The `Remove-HashtableEntry` function filters out keys from a hashtable based on various criteria:
-        - Removing keys with null or empty values.
-        - Removing keys with specific value types.
-        - Removing keys with specific names.
-        - Removing keys that do not match a specified type or name.
+        This version applies keep filters with the highest precedence. If a key
+        qualifies based on the provided Keep parameters (KeepTypes and/or KeepKeys),
+        it is preserved no matter what removal conditions might say.
 
-        The function operates directly on the input hashtable.
+        If no keep filters are provided, the function applies removal conditions:
+        - NullOrEmptyValues: Remove keys with null or empty values.
+        - RemoveTypes: Remove keys whose values are of the specified type(s).
+        - RemoveKeys: Remove keys with the specified name(s).
 
-        .EXAMPLE
-        $Hashtable = @{
-            'Key1' = 'Value1'
-            'Key2' = 'Value2'
-            'Key3' = $null
-            'Key4' = 'Value4'
-            'Key5' = ''
-        }
-        $Hashtable | Remove-HashtableEntry -NullOrEmptyValues
+        When Keep filters are provided, only keys that match ALL specified keep criteria
+        will be preserved; keys that do not match are removed regardless of removal settings.
 
-        Output:
-        ```powershell
-        Name                           Value
-        ----                           -----
-        Key1                           Value1
-        Key2                           Value2
-        Key4                           Value4
-        ```
-
-        Removes all keys with null or empty values from the input hashtable.
+        At the end, the original hashtable is cleared and repopulated with the filtered results.
 
         .EXAMPLE
-        $Hashtable = @{
-            'Key1' = 'Value1'
-            'Key2' = 42
-            'Key3' = $null
-            'Key4' = 'Value4'
-            'Key5' = 3.14
+        $ht = @{
+            KeepThis   = 'Value1'
+            RemoveThis = 'Delete'
+            Other      = 42
         }
-        $Hashtable | Remove-HashtableEntry -RemoveTypes 'Int32', 'Double'
+        $ht | Remove-HashtableEntry -KeepKeys 'KeepThis' -RemoveKeys 'RemoveThis'
 
-        Output:
-        ```powershell
-        Name                           Value
-        ----                           -----
-        Key1                           Value1
-        Key3
-        Key4                           Value4
-        ```
-
-        Removes keys where the values are of type `Int32` or `Double`.
-
-        .EXAMPLE
-        $Hashtable = @{
-            'KeepThis' = 'Value'
-            'RemoveThis' = 'Delete'
-        }
-        $Hashtable | Remove-HashtableEntry -RemoveNames 'RemoveThis'
-
-        Output:
-        ```powershell
-        Name                           Value
-        ----                           -----
-        KeepThis                       Value
-        ```
-
-        Removes a specific key by name.
+        This will keep only the key "KeepThis", regardless of other removal flags.
 
         .OUTPUTS
         hashtable
 
         .NOTES
-        The modified hashtable with specified keys removed.
-
-        .LINK
-        https://psmodule.io/Hashtable/Functions/Remove-HashtableEntry/
+        The function modifies the input hashtable in place.
     #>
-    [OutputType([hashtable])]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
-        'PSUseShouldProcessForStateChangingFunctions',
-        '',
+        'PSUseShouldProcessForStateChangingFunctions', '',
         Justification = 'Function does not change state.'
     )]
+    [OutputType([void])]
     [CmdletBinding()]
     param(
         # The hashtable to remove entries from.
-        [Parameter(
-            Mandatory,
-            ValueFromPipeline
-        )]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [hashtable] $Hashtable,
 
         # Remove keys with null or empty values.
@@ -104,50 +55,45 @@
 
         # Remove keys with a specified name.
         [Parameter()]
-        [string[]] $RemoveNames,
+        [Alias('RemoveNames')]
+        [string[]] $RemoveKeys,
 
-        # Remove keys that are NOT of a specified type.
+        # Keep only keys of a specified type.
         [Parameter()]
+        [Alias('IgnoreType')]
         [string[]] $KeepTypes,
 
-        # Remove keys that are NOT of a specified name.
+        # Keep only keys with a specified name.
         [Parameter()]
-        [string[]] $KeepNames
+        [Alias('IgnoreKey', 'KeepNames')]
+        [string[]] $KeepKeys
     )
 
-    if ($NullOrEmptyValues) {
-        Write-Debug 'Remove keys with null or empty values'
-        ($Hashtable.GetEnumerator() | Where-Object { [string]::IsNullOrEmpty($_.Value) }) | ForEach-Object {
-            Write-Debug " - [$($_.Name)] - Value: [$($_.Value)] - Remove"
-            $Hashtable.Remove($_.Name)
-        }
-    }
-    if ($RemoveTypes) {
-        Write-Debug "Remove keys of type: [$RemoveTypes]"
-        ($Hashtable.GetEnumerator() | Where-Object { ($_.Value.GetType().Name -in $RemoveTypes) }) | ForEach-Object {
-            Write-Debug " - [$($_.Name)] - Type: [$($_.Value.GetType().Name)] - Remove"
-            $Hashtable.Remove($_.Name)
-        }
-    }
-    if ($KeepTypes) {
-        Write-Debug "Remove keys NOT of type: [$KeepTypes]"
-        ($Hashtable.GetEnumerator() | Where-Object { ($_.Value.GetType().Name -notin $KeepTypes) }) | ForEach-Object {
-            Write-Debug " - [$($_.Name)] - Type: [$($_.Value.GetType().Name)] - Remove"
-            $Hashtable.Remove($_.Name)
-        }
-    }
-    if ($RemoveNames) {
-        Write-Debug "Remove keys named: [$RemoveNames]"
-        ($Hashtable.GetEnumerator() | Where-Object { $_.Name -in $RemoveNames }) | ForEach-Object {
-            Write-Debug " - [$($_.Name)] - Remove"
-            $Hashtable.Remove($_.Name)
-        }
-    }
-    if ($KeepNames) {
-        Write-Debug "Remove keys NOT named: [$KeepNames]"
-        ($Hashtable.GetEnumerator() | Where-Object { $_.Name -notin $KeepNames }) | ForEach-Object {
-            Write-Debug " - [$($_.Name)] - Remove"
-            $Hashtable.Remove($_.Name)
+    foreach ($key in $Hashtable.Keys) {
+        $value = $Hashtable[$key]
+        $valueIsNotNullOrEmpty = -not [string]::IsNullOrEmpty($value)
+        $typeName = if ($valueIsNotNullOrEmpty) { $value.GetType().Name } else { $null }
+
+        if ($key -in $KeepKeys) {
+            Write-Debug "Keeping [$key] because it is in KeepKeys [$KeepKeys]."
+            continue
+        } elseif ($value -in $KeepTypes) {
+            Write-Debug "Keeping [$key] because its type [$typeName] is in KeepTypes [$KeepTypes]."
+            continue
+        } elseif ($valueIsNotNullOrEmpty -and $NullOrEmptyValues) {
+            Write-Debug "Removing [$key] because its value is null or empty."
+            $Hashtable.Remove($key)
+            continue
+        } elseif ($typeName -in $RemoveTypes) {
+            Write-Debug "Removing [$key] because its type [$typeName] is in RemoveTypes [$RemoveTypes]."
+            $Hashtable.Remove($key)
+            continue
+        } elseif ($key -in $RemoveKeys) {
+            Write-Debug "Removing [$key] because it is in RemoveKeys [$RemoveKeys]."
+            $Hashtable.Remove($key)
+            continue
+        } else {
+            Write-Debug "Keeping [$key] by default."
         }
     }
 }

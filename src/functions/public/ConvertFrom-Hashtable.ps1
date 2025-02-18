@@ -28,7 +28,7 @@
                 }
             )
         }
-        ConvertFrom-Hashtable -InputHash $hashtable
+        ConvertFrom-Hashtable -InputObject $hashtable
 
         Output:
         ```powershell
@@ -52,27 +52,28 @@
         .LINK
         https://psmodule.io/Hashtable/Functions/ConvertFrom-Hashtable
     #>
+    [OutputType([PSCustomObject])]
     [CmdletBinding()]
     param(
         # The hashtable to convert to a PSCustomObject.
         [Parameter(Mandatory, ValueFromPipeline)]
-        [hashtable] $InputHash
+        [hashtable] $InputObject
     )
 
     # Prepare a hashtable to hold properties for the PSCustomObject.
     $props = @{}
 
-    foreach ($key in $InputHash.Keys) {
-        $value = $InputHash[$key]
+    foreach ($key in $InputObject.Keys) {
+        $value = $InputObject[$key]
 
         if ($value -is [hashtable]) {
             # Recursively convert nested hashtables.
-            $props[$key] = ConvertFrom-Hashtable -InputHash $value
+            $props[$key] = $value | ConvertFrom-Hashtable
         } elseif ($value -is [array]) {
             # Check each element: if it's a hashtable, convert it; otherwise, leave it as is.
             $props[$key] = $value | ForEach-Object {
                 if ($_ -is [hashtable]) {
-                    ConvertFrom-Hashtable -InputHash $_
+                    $_ | ConvertFrom-Hashtable
                 } else {
                     $_
                 }
@@ -83,6 +84,5 @@
         }
     }
 
-    # Return a new PSCustomObject built from the processed properties.
-    return [pscustomobject]$props
+    [pscustomobject]$props
 }
