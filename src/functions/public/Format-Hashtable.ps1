@@ -118,5 +118,5 @@
     }
 
     $lines += "$indent}"
-    return $lines -join "`n"
+    return $lines -join [Environment]::NewLine
 }
