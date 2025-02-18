@@ -1,166 +1,135 @@
-﻿function Format-Hashtable {
+﻿filter Format-Hashtable {
     <#
         .SYNOPSIS
-        Formats a PowerShell hashtable into a structured, indented string representation.
+        Converts a hashtable to its PowerShell code representation.
 
         .DESCRIPTION
-        This function takes a hashtable as input and returns a formatted string that represents
-        the hashtable in a readable and structured PowerShell syntax. It supports nested hashtables
-        and arrays, preserving indentation for clarity.
-
-        This is useful for logging, debugging, or displaying structured data in a human-readable format.
+        Recursively converts a hashtable to its PowerShell code representation.
+        This function is useful for exporting hashtables to `.psd1` files,
+        making it easier to store and retrieve structured data.
 
         .EXAMPLE
-        $hash = @{
-            Name = "PowerShell"
-            Version = "7.3"
-            Nested = @{
-                Key1 = "Value1"
-                Key2 = "Value2"
+        $hashtable = @{
+            Key1 = 'Value1'
+            Key2 = @{
+                NestedKey1 = 'NestedValue1'
+                NestedKey2 = 'NestedValue2'
             }
-            List = @("Item1", "Item2")
+            Key3 = @(1, 2, 3)
+            Key4 = $true
         }
-        Format-Hashtable -Hashtable $hash
+        Format-Hashtable -Hashtable $hashtable
 
         Output:
         ```powershell
         @{
-            Name = 'PowerShell'
-            Version = '7.3'
-            Nested = @{
-                Key1 = 'Value1'
-                Key2 = 'Value2'
+            Key1 = 'Value1'
+            Key2 = @{
+                NestedKey1 = 'NestedValue1'
+                NestedKey2 = 'NestedValue2'
             }
-            List = @(
-                'Item1'
-                'Item2'
-            )
+            Key3 = @(1, 2, 3)
+            Key4 = $true
         }
         ```
 
-        Formats the given hashtable into a structured PowerShell representation.
+        Converts the provided hashtable into a PowerShell-formatted string representation.
 
         .OUTPUTS
-        System.String
+        string
 
         .NOTES
-        A formatted string representation of the given hashtable.
+        A string representation of the given hashtable.
+        Useful for serialization and exporting hashtables to files.
 
         .LINK
         https://psmodule.io/Format/Functions/Format-Hashtable
     #>
+    [OutputType([string])]
     [CmdletBinding()]
-    param(
-        # The hashtable to format into a structured string representation.
-        [Parameter(Mandatory)]
-        [System.Collections.IDictionary] $Hashtable,
+    param (
+        # The hashtable to convert to a PowerShell code representation.
+        [Parameter(
+            Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName
+        )]
+        [object] $Hashtable,
 
-        # Internal use for recursion, specifies indentation level (default is 0).
-        [int] $Indent = 0
+        # The indentation level for formatting nested structures.
+        [Parameter()]
+        [int] $IndentLevel = 0
     )
 
-    # Determine indent strings for current level and next level
-    $indentStr = ' ' * 4 * $Indent      # current level indent (4 spaces per level)
-    $indentStrOne = ' ' * 4 * ($Indent + 1)  # one level deeper
-
-    # Use a list to accumulate output lines for efficiency
-    $lines = New-Object System.Collections.Generic.List[string]
-
-    # Opening brace for hashtable (with @ sign for literal syntax)
-    $lines.Add("$indentStr@{")
+    $lines = @()
+    $lines += '@{'
+    $indent = '    ' * $IndentLevel
 
     foreach ($key in $Hashtable.Keys) {
-        # Format the key, quoting it if necessary for valid PowerShell syntax
-        $keyStr = if ($key -is [string]) {
-            if ($key -match '\s|[^A-Za-z0-9_]') {
-                # contains space or special char - quote the key
-                "'" + $key.Replace("'", "''") + "'"  # single-quote, escape internal '
-            } else {
-                $key  # safe unquoted key
-            }
-        } else {
-            # Non-string keys: use $true/$false for bool, $null for null, otherwise toString
-            if ($key -eq $true -or $key -eq $false) {
-                $key.ToString().ToLower()  # $true/$false as lowercase
-            } elseif ($null -eq $key) {
-                '$null'
-            } else {
-                $key   # numeric or other types output as-is (will call ToString if not string)
-            }
-        }
-
-        # Get the value for this key
+        Write-Verbose "Processing key: $key"
         $value = $Hashtable[$key]
-
-        if ($value -is [System.Collections.IDictionary]) {
-            # Nested hashtable: output key = @{ then recurse
-            $lines.Add("$indentStrOne$keyStr = @{")
-            # Recurse with Indent+2 (one for this nested content, one because we already at indentStrOne for key)
-            $nested = Format-Hashtable -Hashtable $value -Indent ($Indent + 2)
-            # Add each nested line (which already includes its closing brace and newline structure)
-            foreach ($line in ($nested -split [environment]::NewLine)) {
-                if ($line) { $lines.Add($line) }
+        Write-Verbose "Processing value: $value"
+        if ($null -eq $value) {
+            Write-Verbose "Value type: `$null"
+            continue
+        }
+        Write-Verbose "Value type: $($value.GetType().Name)"
+        switch -Regex ($value.GetType().Name) {
+            'Hashtable|OrderedDictionary' {
+                $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
+                $lines += "$indent    $key = $nestedString"
             }
-            # Add closing brace for this nested hashtable, aligned with indentStrOne
-            $lines.Add("$indentStrOne`}")
-        } elseif ($value -is [System.Collections.IEnumerable] -and -not ($value -is [string])) {
-            # Array or collection: output key = @(
-            $lines.Add("$indentStrOne$keyStr = @(")
-            foreach ($elem in $value) {
-                if ($elem -is [System.Collections.IDictionary]) {
-                    # Hashtable element inside array
-                    $lines.Add((' ' * 4 * ($Indent + 2)) + '@{')
-                    $nestedElem = Format-Hashtable -Hashtable $elem -Indent ($Indent + 3)
-                    foreach ($line in ($nestedElem -split [environment]::NewLine)) {
-                        if ($line) { $lines.Add($line) }
-                    }
-                    $lines.Add((' ' * 4 * ($Indent + 2)) + '}')
-                } elseif ($elem -is [System.Collections.IEnumerable] -and -not ($elem -is [string])) {
-                    # Nested array inside array (rare): format recursively
-                    $lines.Add((' ' * 4 * ($Indent + 2)) + '@(')
-                    $nestedArr = Format-Hashtable -Hashtable @{'__ArrayTemp' = $elem } -Indent ($Indent + 3)
-                    # Remove the artificial key wrappers "__ArrayTemp = " and just take its elements
-                    $nestedArrLines = $nestedArr -split [environment]::NewLine
-                    # Skip first line (@{) and last (}) and take the content in between as the array elements
-                    $nestedArrContent = $nestedArrLines[1..($nestedArrLines.Length - 2)]
-                    foreach ($line in $nestedArrContent) {
-                        # Replace leading 8 spaces (2 indent levels) with current indent for array element
-                        $lines.Add((' ' * 4 * ($Indent + 3)) + $line.TrimStart())
-                    }
-                    $lines.Add((' ' * 4 * ($Indent + 2)) + ')')
+            'PSCustomObject|PSObject' {
+                $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
+                $lines += "$indent    $key = $nestedString"
+            }
+            'bool' {
+                $lines += "$indent    $key = `$$($value.ToString().ToLower())"
+            }
+            'int' {
+                $lines += "$indent    $key = $value"
+            }
+            'array|list' {
+                if ($value.Count -eq 0) {
+                    $lines += "$indent    $key = @()"
                 } else {
-                    # Simple element: format with quotes if string
-                    $elemStr = if ($elem -is [string]) {
-                        "'" + $elem.Replace("'", "''") + "'"
-                    } elseif ($elem -eq $true -or $elem -eq $false) {
-                        $elem.ToString().ToLower()
-                    } elseif ($null -eq $elem) {
-                        '$null'
-                    } else {
-                        $elem  # number or other type
+                    $lines += "$indent    $key = @("
+                    $arrayIndent = "$indent        "  # Increase indentation for elements inside @(...)
+
+                    $value | ForEach-Object {
+                        $nestedValue = $_
+                        Write-Verbose "Processing array element: $_"
+                        Write-Verbose "Element type: $($_.GetType().Name)"
+                        switch -Regex ($nestedValue.GetType().Name) {
+                            'Hashtable|OrderedDictionary' {
+                                $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 2)
+                                $lines += "$arrayIndent$nestedString"
+                            }
+                            'PSCustomObject|PSObject' {
+                                $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 2)
+                                $lines += "$arrayIndent$nestedString"
+                            }
+                            'bool' {
+                                $lines += "$arrayIndent`$$($nestedValue.ToString().ToLower())"
+                            }
+                            'int' {
+                                $lines += "$arrayIndent$nestedValue"
+                            }
+                            default {
+                                $lines += "$arrayIndent'$nestedValue'"
+                            }
+                        }
                     }
-                    $lines.Add((' ' * 4 * ($Indent + 2)) + "$elemStr")
+                    $lines += "$indent    )"
                 }
             }
-            # Closing parenthesis for array
-            $lines.Add("$indentStrOne)")
-        } else {
-            # Scalar value: format with quotes if it's a string, or appropriate literal
-            $valStr = if ($value -is [string]) {
-                "'" + $value.Replace("'", "''") + "'"
-            } elseif ($value -eq $true -or $value -eq $false) {
-                $value.ToString().ToLower()
-            } elseif ($null -eq $value) {
-                '$null'
-            } else {
-                $value
+            default {
+                $value = $value -replace "('+)", "''" # Escape single quotes in a manifest file
+                $lines += "$indent    $key = '$value'"
             }
-            $lines.Add("$indentStrOne$keyStr = $valStr")
         }
     }
 
-    # Closing brace for the hashtable
-    $lines.Add("$indentStr}")
-    # Join all lines into final string with OS-specific newline
-    return $lines.ToArray() -join [Environment]::NewLine
+    $lines += "$indent}"
+    return $lines -join "`n"
 }
