@@ -100,14 +100,14 @@
                     Write-Verbose "Processing array element: $_"
                     Write-Verbose "Element type: $($_.GetType().Name)"
                     if (($nestedValue -is [System.Collections.Hashtable]) -or ($nestedValue -is [System.Collections.Specialized.OrderedDictionary])) {
-                        $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 1)
-                        $lines += "$levelIndent$nestedString"
+                        $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 2)
+                        $lines += "$arrayIndent$nestedString"
                     } elseif ($nestedValue -is [bool]) {
-                        $lines += "$levelIndent`$$($nestedValue.ToString().ToLower())"
+                        $lines += "$arrayIndent`$$($nestedValue.ToString().ToLower())"
                     } elseif ($nestedValue -is [int]) {
-                        $lines += "$levelIndent$nestedValue"
+                        $lines += "$arrayIndent$nestedValue"
                     } else {
-                        $lines += "$levelIndent'$nestedValue'"
+                        $lines += "$arrayIndent'$nestedValue'"
                     }
                 }
                 $arrayIndent = $levelIndent
