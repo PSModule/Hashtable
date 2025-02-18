@@ -1,11 +1,12 @@
-﻿function Convert-HashtableToString {
+﻿filter Format-Hashtable {
     <#
         .SYNOPSIS
-        Converts a hashtable to its code representation.
+        Converts a hashtable to its PowerShell code representation.
 
         .DESCRIPTION
-        Recursively converts a hashtable to its code representation.
-        This function is useful for exporting hashtables to .psd1 files.
+        Recursively converts a hashtable to its PowerShell code representation.
+        This function is useful for exporting hashtables to `.psd1` files,
+        making it easier to store and retrieve structured data.
 
         .EXAMPLE
         $hashtable = @{
@@ -17,9 +18,10 @@
             Key3 = @(1, 2, 3)
             Key4 = $true
         }
-        Convert-HashtableToString -Hashtable $hashtable
+        Format-Hashtable -Hashtable $hashtable
 
-        This will return the following string:
+        Output:
+        ```powershell
         @{
             Key1 = 'Value1'
             Key2 = @{
@@ -29,19 +31,33 @@
             Key3 = @(1, 2, 3)
             Key4 = $true
         }
+        ```
+
+        Converts the provided hashtable into a PowerShell-formatted string representation.
+
+        .OUTPUTS
+        string
 
         .NOTES
-        General notes
+        A string representation of the given hashtable.
+        Useful for serialization and exporting hashtables to files.
+
+        .LINK
+        https://psmodule.io/Format/Functions/Format-Hashtable
     #>
     [CmdletBinding()]
     param (
-        # The hashtable to convert to a string.
-        [Parameter(Mandatory)]
-        [object]$Hashtable,
+        # The hashtable to convert to a PowerShell code representation.
+        [Parameter(
+            Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName
+        )]
+        [object] $Hashtable,
 
-        # The indentation level.
+        # The indentation level for formatting nested structures.
         [Parameter()]
-        [int]$IndentLevel = 0
+        [int] $IndentLevel = 0
     )
 
     $lines = @()
@@ -58,13 +74,13 @@
         }
         Write-Verbose "Value type: $($value.GetType().Name)"
         if (($value -is [System.Collections.Hashtable]) -or ($value -is [System.Collections.Specialized.OrderedDictionary])) {
-            $nestedString = Convert-HashtableToString -Hashtable $value -IndentLevel ($IndentLevel + 1)
+            $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
             $lines += "$indent    $key = $nestedString"
         } elseif ($value -is [System.Management.Automation.PSCustomObject]) {
-            $nestedString = Convert-HashtableToString -Hashtable $value -IndentLevel ($IndentLevel + 1)
+            $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
             $lines += "$indent    $key = $nestedString"
         } elseif ($value -is [System.Management.Automation.PSObject]) {
-            $nestedString = Convert-HashtableToString -Hashtable $value -IndentLevel ($IndentLevel + 1)
+            $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
             $lines += "$indent    $key = $nestedString"
         } elseif ($value -is [bool]) {
             $lines += "$indent    $key = `$$($value.ToString().ToLower())"
@@ -75,19 +91,21 @@
                 $lines += "$indent    $key = @()"
             } else {
                 $lines += "$indent    $key = @("
+                $arrayIndent = "$indent        "  # Increase indentation for elements inside @(...)
+
                 $value | ForEach-Object {
                     $nestedValue = $_
                     Write-Verbose "Processing array element: $_"
                     Write-Verbose "Element type: $($_.GetType().Name)"
                     if (($nestedValue -is [System.Collections.Hashtable]) -or ($nestedValue -is [System.Collections.Specialized.OrderedDictionary])) {
-                        $nestedString = Convert-HashtableToString -Hashtable $nestedValue -IndentLevel ($IndentLevel + 1)
-                        $lines += "$indent    $nestedString"
+                        $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 1)
+                        $lines += "$arrayIndent$nestedString"
                     } elseif ($nestedValue -is [bool]) {
-                        $lines += "$indent    `$$($nestedValue.ToString().ToLower())"
+                        $lines += "$arrayIndent`$$($nestedValue.ToString().ToLower())"
                     } elseif ($nestedValue -is [int]) {
-                        $lines += "$indent    $nestedValue"
+                        $lines += "$arrayIndent$nestedValue"
                     } else {
-                        $lines += "$indent        '$nestedValue'"
+                        $lines += "$arrayIndent'$nestedValue'"
                     }
                 }
                 $lines += "$indent    )"

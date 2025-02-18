@@ -206,4 +206,179 @@
             $hashtable.Person.Certifications.count | Should -Be 2
         }
     }
+
+    Describe 'Format-Hashtable' {
+        Context 'Simple Hashtable' {
+            It 'formats a simple hashtable correctly' {
+                $ht = [ordered]@{
+                    Key1 = 'Value1'
+                    Key2 = 123
+                }
+                $expected = @'
+@{
+    Key1 = 'Value1'
+    Key2 = 123
+}
+'@.TrimEnd()
+
+                $result = Format-Hashtable -Hashtable $ht
+                $result | Should -Be $expected
+            }
+        }
+
+        Context 'Nested Hashtable' {
+            It 'formats a nested hashtable correctly' {
+                $ht = [ordered]@{
+                    Key1 = 'Value1'
+                    Key2 = [ordered]@{
+                        NestedKey1 = 'NestedValue1'
+                        NestedKey2 = 'NestedValue2'
+                    }
+                }
+                $expected = @'
+@{
+    Key1 = 'Value1'
+    Key2 = @{
+        NestedKey1 = 'NestedValue1'
+        NestedKey2 = 'NestedValue2'
+    }
+}
+'@.TrimEnd()
+
+                $result = Format-Hashtable -Hashtable $ht
+                $result | Should -Be $expected
+            }
+        }
+
+        Context 'Hashtable with Array' {
+            It 'formats a hashtable containing an array correctly' {
+                $ht = @{
+                    Key3 = @(1, 2, 3)
+                }
+                $expected = @'
+@{
+    Key3 = @(
+        1
+        2
+        3
+    )
+}
+'@.TrimEnd()
+
+                $result = Format-Hashtable -Hashtable $ht
+                $result | Should -Be $expected
+            }
+        }
+
+        Context 'Hashtable with Boolean' {
+            It 'formats boolean values correctly' {
+                $ht = @{
+                    Key4 = $true
+                }
+                $expected = @"
+@{
+    Key4 = $true
+}
+"@.TrimEnd()
+
+                $result = Format-Hashtable -Hashtable $ht
+                $result | Should -Be $expected
+            }
+        }
+
+        Context 'Escaping Single Quotes' {
+            It 'escapes single quotes in string values' {
+                $ht = @{
+                    Key5 = "O'Reilly"
+                }
+                # Note: The function replaces one or more single quotes with two single quotes.
+                $expected = @'
+@{
+    Key5 = "O'Reilly"
+}
+'@.TrimEnd()
+
+                $result = Format-Hashtable -Hashtable $ht
+                $result | Should -Be $expected
+            }
+        }
+
+        Context 'A complex hashtable structure' {
+            It 'Should correctly format a complex nested hashtable' {
+                # Arrange - Define the complex test hashtable
+                $testHashtable = [ordered]@{
+                    StringKey       = "Hello 'PowerShell'!"
+                    NumberKey       = 42
+                    BooleanKey      = $true
+                    NullKey         = $null
+                    ArrayKey        = @(
+                        'FirstItem'
+                        123
+                        $false
+                        @('NestedArray1', 'NestedArray2')
+                        @{
+                            NestedHashtableKey1 = 'NestedValue1'
+                            NestedHashtableKey2 = @(
+                                @{ DeepNestedKey = 'DeepValue' }
+                                999
+                            )
+                        }
+                    )
+                    NestedHashtable = @{
+                        SubKey1 = 'SubValue1'
+                        SubKey2 = @(
+                            'ArrayInsideHashtable1'
+                            'ArrayInsideHashtable2'
+                            @{
+                                EvenDeeper = "Yes, it's deep!"
+                            }
+                        )
+                    }
+                }
+
+                # Act - Run the function
+                $formatted = Format-Hashtable -Hashtable $testHashtable
+
+                # Assert - Define the expected output
+                $expectedOutput = @"
+@{
+    StringKey = 'Hello ''PowerShell''!'
+    NumberKey = 42
+    BooleanKey = `$true
+    ArrayKey = @(
+        'FirstItem'
+        123
+        `$false
+        @(
+            'NestedArray1'
+            'NestedArray2'
+        )
+        @{
+            NestedHashtableKey1 = 'NestedValue1'
+            NestedHashtableKey2 = @(
+                @{
+                    DeepNestedKey = 'DeepValue'
+                }
+                999
+            )
+        }
+    )
+    NestedHashtable = @{
+        SubKey1 = 'SubValue1'
+        SubKey2 = @(
+            'ArrayInsideHashtable1'
+            'ArrayInsideHashtable2'
+            @{
+                EvenDeeper = 'Yes, it''s deep!'
+            }
+        )
+    }
+}
+"@.Trim() # Trim to remove any unintended whitespace
+
+                # Compare function output to expected output
+                $formatted | Should -BeExactly $expectedOutput
+            }
+        }
+    }
 }
