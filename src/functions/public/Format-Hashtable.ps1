@@ -74,59 +74,46 @@
             continue
         }
         Write-Verbose "Value type: $($value.GetType().Name)"
-        switch -Regex ($value.GetType().Name) {
-            'Hashtable|OrderedDictionary' {
-                $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
-                $lines += "$indent    $key = $nestedString"
-            }
-            'PSCustomObject|PSObject' {
-                $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
-                $lines += "$indent    $key = $nestedString"
-            }
-            'bool' {
-                $lines += "$indent    $key = `$$($value.ToString().ToLower())"
-            }
-            'int' {
-                $lines += "$indent    $key = $value"
-            }
-            'array|list' {
-                if ($value.Count -eq 0) {
-                    $lines += "$indent    $key = @()"
-                } else {
-                    $lines += "$indent    $key = @("
-                    $arrayIndent = "$indent        "  # Increase indentation for elements inside @(...)
+        if (($value -is [System.Collections.Hashtable]) -or ($value -is [System.Collections.Specialized.OrderedDictionary])) {
+            $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
+            $lines += "$indent    $key = $nestedString"
+        } elseif ($value -is [System.Management.Automation.PSCustomObject]) {
+            $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
+            $lines += "$indent    $key = $nestedString"
+        } elseif ($value -is [System.Management.Automation.PSObject]) {
+            $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
+            $lines += "$indent    $key = $nestedString"
+        } elseif ($value -is [bool]) {
+            $lines += "$indent    $key = `$$($value.ToString().ToLower())"
+        } elseif ($value -is [int]) {
+            $lines += "$indent    $key = $value"
+        } elseif ($value -is [array]) {
+            if ($value.Count -eq 0) {
+                $lines += "$indent    $key = @()"
+            } else {
+                $lines += "$indent    $key = @("
+                $arrayIndent = "$indent        "  # Increase indentation for elements inside @(...)
 
-                    $value | ForEach-Object {
-                        $nestedValue = $_
-                        Write-Verbose "Processing array element: $_"
-                        Write-Verbose "Element type: $($_.GetType().Name)"
-                        switch -Regex ($nestedValue.GetType().Name) {
-                            'Hashtable|OrderedDictionary' {
-                                $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 2)
-                                $lines += "$arrayIndent$nestedString"
-                            }
-                            'PSCustomObject|PSObject' {
-                                $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 2)
-                                $lines += "$arrayIndent$nestedString"
-                            }
-                            'bool' {
-                                $lines += "$arrayIndent`$$($nestedValue.ToString().ToLower())"
-                            }
-                            'int' {
-                                $lines += "$arrayIndent$nestedValue"
-                            }
-                            default {
-                                $lines += "$arrayIndent'$nestedValue'"
-                            }
-                        }
+                $value | ForEach-Object {
+                    $nestedValue = $_
+                    Write-Verbose "Processing array element: $_"
+                    Write-Verbose "Element type: $($_.GetType().Name)"
+                    if (($nestedValue -is [System.Collections.Hashtable]) -or ($nestedValue -is [System.Collections.Specialized.OrderedDictionary])) {
+                        $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 1)
+                        $lines += "$arrayIndent$nestedString"
+                    } elseif ($nestedValue -is [bool]) {
+                        $lines += "$arrayIndent`$$($nestedValue.ToString().ToLower())"
+                    } elseif ($nestedValue -is [int]) {
+                        $lines += "$arrayIndent$nestedValue"
+                    } else {
+                        $lines += "$arrayIndent'$nestedValue'"
                     }
-                    $lines += "$indent    )"
                 }
+                $lines += "$indent    )"
             }
-            default {
-                $value = $value -replace "('+)", "''" # Escape single quotes in a manifest file
-                $lines += "$indent    $key = '$value'"
-            }
+        } else {
+            $value = $value -replace "('+)", "''" # Escape single quotes in a manifest file
+            $lines += "$indent    $key = '$value'"
         }
     }
 
