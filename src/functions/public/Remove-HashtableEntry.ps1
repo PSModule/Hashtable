@@ -73,24 +73,25 @@
     $keys = @($Hashtable.Keys)
     foreach ($key in $keys) {
         $value = $Hashtable[$key]
-        $valueIsNotNullOrEmpty = -not [string]::IsNullOrEmpty($value)
+        $vaultIsNullOrEmpty = [string]::IsNullOrEmpty($value)
+        $valueIsNotNullOrEmpty = -not $vaultIsNullOrEmpty
         $typeName = if ($valueIsNotNullOrEmpty) { $value.GetType().Name } else { $null }
 
-        if ($key -in $KeepKeys) {
+        if ($KeepKeys -and $key -in $KeepKeys) {
             Write-Debug "Keeping [$key] because it is in KeepKeys [$KeepKeys]."
             continue
-        } elseif ($value -in $KeepTypes) {
+        } elseif ($KeepTypes -and $typeName -in $KeepTypes) {
             Write-Debug "Keeping [$key] because its type [$typeName] is in KeepTypes [$KeepTypes]."
             continue
-        } elseif ($valueIsNotNullOrEmpty -and $NullOrEmptyValues) {
+        } elseif ($vaultIsNullOrEmpty -and $NullOrEmptyValues) {
             Write-Debug "Removing [$key] because its value is null or empty."
             $Hashtable.Remove($key)
             continue
-        } elseif ($typeName -in $RemoveTypes) {
+        } elseif ($RemoveTypes -and $typeName -in $RemoveTypes) {
             Write-Debug "Removing [$key] because its type [$typeName] is in RemoveTypes [$RemoveTypes]."
             $Hashtable.Remove($key)
             continue
-        } elseif ($key -in $RemoveKeys) {
+        } elseif ($RemoveKeys -and $key -in $RemoveKeys) {
             Write-Debug "Removing [$key] because it is in RemoveKeys [$RemoveKeys]."
             $Hashtable.Remove($key)
             continue
