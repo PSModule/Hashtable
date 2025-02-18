@@ -99,12 +99,12 @@
             Write-Debug "Removing [$key] because its value is null or empty."
             $Hashtable.Remove($key)
             continue
-        } elseif ($RemoveTypes -and $typeName -in $RemoveTypes) {
-            Write-Debug "Removing [$key] because its type [$typeName] is in RemoveTypes [$RemoveTypes]."
+        } elseif ($Types -and $typeName -in $Types) {
+            Write-Debug "Removing [$key] because its type [$typeName] is in RemoveTypes [$Types]."
             $Hashtable.Remove($key)
             continue
-        } elseif ($RemoveKeys -and $key -in $RemoveKeys) {
-            Write-Debug "Removing [$key] because it is in RemoveKeys [$RemoveKeys]."
+        } elseif ($Keys -and $key -in $Keys) {
+            Write-Debug "Removing [$key] because it is in RemoveKeys [$Keys]."
             $Hashtable.Remove($key)
             continue
         } elseif ($All) {
