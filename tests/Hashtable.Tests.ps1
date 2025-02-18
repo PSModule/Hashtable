@@ -324,7 +324,7 @@
                             )
                         }
                     )
-                    NestedHashtable = @{
+                    NestedHashtable = [ordered]@{
                         SubKey1 = 'SubValue1'
                         SubKey2 = @(
                             'ArrayInsideHashtable1'
