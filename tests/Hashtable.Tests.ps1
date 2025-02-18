@@ -454,7 +454,7 @@
                     'Key4' = 'Value4'
                     'Key5' = 3.14
                 }
-                $Hashtable | Remove-HashtableEntry -RemoveTypes 'Int', 'Double'
+                $Hashtable | Remove-HashtableEntry -RemoveTypes 'Int32', 'Double' -Verbose
 
                 $Hashtable.Keys | Should -Not -Contain 'Key2'
                 $Hashtable.Keys | Should -Not -Contain 'Key5'
@@ -484,7 +484,7 @@
                     'Key4' = 'Value4'
                     'Key5' = 3.14
                 }
-                $Hashtable | Remove-HashtableEntry -KeepTypes 'String'
+                $Hashtable | Remove-HashtableEntry -All -KeepTypes 'String'
 
                 $Hashtable.Keys | Should -Contain 'Key1'
                 $Hashtable.Keys | Should -Contain 'Key4'
@@ -498,7 +498,7 @@
                     'KeepThis'   = 'Value'
                     'RemoveThis' = 'Delete'
                 }
-                $Hashtable | Remove-HashtableEntry -KeepNames 'KeepThis'
+                $Hashtable | Remove-HashtableEntry -All -KeepNames 'KeepThis'
 
                 $Hashtable.Keys | Should -Contain 'KeepThis'
                 $Hashtable.Keys | Should -Not -Contain 'RemoveThis'

@@ -66,7 +66,11 @@
         # Keep only keys with a specified name.
         [Parameter()]
         [Alias('IgnoreKey', 'KeepNames')]
-        [string[]] $KeepKeys
+        [string[]] $KeepKeys,
+
+        # Remove all entries from the hashtable.
+        [Parameter()]
+        [switch] $All
     )
 
     # Copy keys to a static array to prevent modifying the collection during iteration.
@@ -95,6 +99,9 @@
             Write-Debug "Removing [$key] because it is in RemoveKeys [$RemoveKeys]."
             $Hashtable.Remove($key)
             continue
+        } elseif ($All) {
+            Write-Debug "Removing [$key] because All flag is set."
+            $Hashtable.Remove($key)
         } else {
             Write-Debug "Keeping [$key] by default."
         }
