@@ -69,7 +69,8 @@
         [string[]] $KeepKeys
     )
 
-    $keys = $Hashtable.Keys
+    # Copy keys to a static array to prevent modifying the collection during iteration.
+    $keys = @($Hashtable.Keys)
     foreach ($key in $keys) {
         $value = $Hashtable[$key]
         $valueIsNotNullOrEmpty = -not [string]::IsNullOrEmpty($value)
