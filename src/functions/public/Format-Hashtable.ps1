@@ -28,7 +28,11 @@
                 NestedKey1 = 'NestedValue1'
                 NestedKey2 = 'NestedValue2'
             }
-            Key3 = @(1, 2, 3)
+            Key3 = @(
+                1
+                2
+                3
+            )
             Key4 = $true
         }
         ```
@@ -86,7 +90,7 @@
             $lines += "$levelIndent$key = $nestedString"
         } elseif ($value -is [bool]) {
             $lines += "$levelIndent$key = `$$($value.ToString().ToLower())"
-        } elseif ($value -is [int]) {
+        } elseif ($value -is [int] -or $value -is [double]) {
             $lines += "$levelIndent$key = $value"
         } elseif ($value -is [array]) {
             if ($value.Count -eq 0) {
