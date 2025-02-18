@@ -51,16 +51,21 @@
 
         # Remove keys of a specified type.
         [Parameter()]
-        [string[]] $RemoveTypes,
+        [string[]] $Types,
 
         # Remove keys with a specified name.
         [Parameter()]
-        [Alias('RemoveNames')]
-        [string[]] $RemoveKeys,
+        [Alias('Names')]
+        [string[]] $Keys,
+
+        # Remove keys with null or empty values.
+        [Parameter()]
+        [Alias('IgnoreNullOrEmptyValues')]
+        [switch] $KeepNullOrEmptyValues,
 
         # Keep only keys of a specified type.
         [Parameter()]
-        [Alias('IgnoreType')]
+        [Alias('IgnoreTypes')]
         [string[]] $KeepTypes,
 
         # Keep only keys with a specified name.
@@ -86,6 +91,9 @@
             continue
         } elseif ($KeepTypes -and $typeName -in $KeepTypes) {
             Write-Debug "Keeping [$key] because its type [$typeName] is in KeepTypes [$KeepTypes]."
+            continue
+        } elseif ($vaultIsNullOrEmpty -and $KeepNullOrEmptyValues) {
+            Write-Debug "Keeping [$key] because its value is null or empty."
             continue
         } elseif ($vaultIsNullOrEmpty -and $NullOrEmptyValues) {
             Write-Debug "Removing [$key] because its value is null or empty."
