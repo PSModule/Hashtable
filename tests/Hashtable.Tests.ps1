@@ -207,6 +207,55 @@
         }
     }
 
+    Describe 'ConvertFrom-Hashtable' {
+        Context 'ConvertFrom-Hashtable - simple usage' {
+            It 'ConvertFrom-Hashtable - converts a flat hashtable to PSCustomObject' {
+                $hashtable = @{ Name = 'John Doe'; Age = 30 }
+                $result = ConvertFrom-Hashtable -InputHash $hashtable
+
+                $result | Should -BeOfType [PSCustomObject]
+                $result.Name | Should -Be 'John Doe'
+                $result.Age | Should -Be 30
+            }
+        }
+
+        Context 'ConvertFrom-Hashtable - nested hashtable conversion' {
+            It 'ConvertFrom-Hashtable - correctly converts nested hashtables' {
+                $hashtable = @{ Address = @{ Street = '123 Main St'; City = 'Somewhere' } }
+                $result = ConvertFrom-Hashtable -InputHash $hashtable
+
+                $result | Should -BeOfType [PSCustomObject]
+                $result.Address | Should -BeOfType [PSCustomObject]
+                $result.Address.Street | Should -Be '123 Main St'
+                $result.Address.City | Should -Be 'Somewhere'
+            }
+        }
+
+        Context 'ConvertFrom-Hashtable - array of hashtables' {
+            It 'ConvertFrom-Hashtable - converts an array of hashtables to objects' {
+                $hashtable = @{ Employees = @(@{ Name = 'Alice' }, @{ Name = 'Bob' }) }
+                $result = ConvertFrom-Hashtable -InputHash $hashtable
+
+                $result | Should -BeOfType [PSCustomObject]
+                $result.Employees | Should -BeOfType [object[]]
+                $result.Employees.Count | Should -Be 2
+                $result.Employees[0] | Should -BeOfType [PSCustomObject]
+                $result.Employees[0].Name | Should -Be 'Alice'
+                $result.Employees[1].Name | Should -Be 'Bob'
+            }
+        }
+
+        Context 'ConvertFrom-Hashtable - empty hashtable' {
+            It 'ConvertFrom-Hashtable - returns an empty PSCustomObject when input is empty' {
+                $hashtable = @{}
+                $result = ConvertFrom-Hashtable -InputHash $hashtable
+
+                $result | Should -BeOfType [PSCustomObject]
+                ($result.PSObject.Properties.Name.Count) | Should -Be 0
+            }
+        }
+    }
+
     Describe 'Format-Hashtable' {
         Context 'Simple Hashtable' {
             It 'formats a simple hashtable correctly' {
@@ -376,6 +425,86 @@
 
                 # Compare function output to expected output
                 $formatted | Should -BeExactly $expectedOutput
+            }
+        }
+    }
+
+    Describe 'Remove-HashtableEntry' {
+        Context 'Remove-HashtableEntry - NullOrEmptyValues' {
+            It 'Removes keys with null or empty values' {
+                $Hashtable = @{
+                    'Key1' = 'Value1'
+                    'Key2' = 'Value2'
+                    'Key3' = $null
+                    'Key4' = 'Value4'
+                    'Key5' = ''
+                }
+                $Hashtable | Remove-HashtableEntry -NullOrEmptyValues
+
+                $Hashtable.Keys | Should -NotContain 'Key3'
+                $Hashtable.Keys | Should -NotContain 'Key5'
+                $Hashtable.Keys.Count | Should -Be 3
+            }
+        }
+
+        Context 'Remove-HashtableEntry - RemoveTypes' {
+            It 'Removes keys with specified value types' {
+                $Hashtable = @{
+                    'Key1' = 'Value1'
+                    'Key2' = 42
+                    'Key3' = $null
+                    'Key4' = 'Value4'
+                    'Key5' = 3.14
+                }
+                $Hashtable | Remove-HashtableEntry -RemoveTypes 'Int', 'Double'
+
+                $Hashtable.Keys | Should -NotContain 'Key2'
+                $Hashtable.Keys | Should -NotContain 'Key5'
+                $Hashtable.Keys.Count | Should -Be 3
+            }
+        }
+
+        Context 'Remove-HashtableEntry - RemoveNames' {
+            It 'Removes specific keys by name' {
+                $Hashtable = @{
+                    'KeepThis'   = 'Value'
+                    'RemoveThis' = 'Delete'
+                }
+                $Hashtable | Remove-HashtableEntry -RemoveNames 'RemoveThis'
+
+                $Hashtable.Keys | Should -NotContain 'RemoveThis'
+                $Hashtable.Keys.Count | Should -Be 1
+            }
+        }
+
+        Context 'Remove-HashtableEntry - KeepTypes' {
+            It 'Removes keys not of specified types' {
+                $Hashtable = @{
+                    'Key1' = 'Value1'
+                    'Key2' = 42
+                    'Key3' = $null
+                    'Key4' = 'Value4'
+                    'Key5' = 3.14
+                }
+                $Hashtable | Remove-HashtableEntry -KeepTypes 'String'
+
+                $Hashtable.Keys | Should -Contain 'Key1'
+                $Hashtable.Keys | Should -Contain 'Key4'
+                $Hashtable.Keys.Count | Should -Be 2
+            }
+        }
+
+        Context 'Remove-HashtableEntry - KeepNames' {
+            It 'Removes keys not matching specified names' {
+                $Hashtable = @{
+                    'KeepThis'   = 'Value'
+                    'RemoveThis' = 'Delete'
+                }
+                $Hashtable | Remove-HashtableEntry -KeepNames 'KeepThis'
+
+                $Hashtable.Keys | Should -Contain 'KeepThis'
+                $Hashtable.Keys | Should -NotContain 'RemoveThis'
+                $Hashtable.Keys.Count | Should -Be 1
             }
         }
     }
