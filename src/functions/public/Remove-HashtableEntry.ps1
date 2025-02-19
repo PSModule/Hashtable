@@ -79,8 +79,8 @@
     )
 
     # Copy keys to a static array to prevent modifying the collection during iteration.
-    $keys = @($Hashtable.Keys)
-    foreach ($key in $keys) {
+    $hashtableKeys = @($Hashtable.Keys)
+    foreach ($key in $hashtableKeys) {
         $value = $Hashtable[$key]
         $vaultIsNullOrEmpty = [string]::IsNullOrEmpty($value)
         $valueIsNotNullOrEmpty = -not $vaultIsNullOrEmpty
@@ -96,10 +96,10 @@
             Write-Debug "Removing [$key] because its value is null or empty."
             $Hashtable.Remove($key)
         } elseif ($Types -and $typeName -in $Types) {
-            Write-Debug "Removing [$key] because its type [$typeName] is in RemoveTypes [$Types]."
+            Write-Debug "Removing [$key] because its type [$typeName] is in Types [$Types]."
             $Hashtable.Remove($key)
         } elseif ($Keys -and $key -in $Keys) {
-            Write-Debug "Removing [$key] because it is in RemoveKeys [$Keys]."
+            Write-Debug "Removing [$key] because it is in Keys [$Keys]."
             $Hashtable.Remove($key)
         } elseif ($All) {
             Write-Debug "Removing [$key] because All flag is set."
