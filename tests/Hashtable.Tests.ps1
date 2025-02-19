@@ -270,11 +270,13 @@
                 $ht = [ordered]@{
                     Key1 = 'Value1'
                     Key2 = 123
+                    Key3 = @{}
                 }
                 $expected = @'
 @{
     Key1 = 'Value1'
     Key2 = 123
+    Key3 = @{}
 }
 '@.TrimEnd()
 
