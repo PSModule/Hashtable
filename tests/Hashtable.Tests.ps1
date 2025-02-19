@@ -296,6 +296,7 @@
                         NestedKey2 = 'NestedValue2'
                         NestedKey3 = @{}
                         NestedKey4 = $null
+                        NestedKey5 = ''
                     }
                 }
                 $expected = @'
@@ -306,6 +307,7 @@
         NestedKey2 = 'NestedValue2'
         NestedKey3 = @{}
         NestedKey4 = $null
+        NestedKey5 = ''
     }
 }
 '@.TrimEnd()
@@ -394,6 +396,7 @@
                         SubKey2 = @(
                             'ArrayInsideHashtable1'
                             'ArrayInsideHashtable2'
+                            ''
                             @{
                                 EvenDeeper = "Yes, it's deep!"
                             }
@@ -431,6 +434,7 @@
         SubKey2 = @(
             'ArrayInsideHashtable1'
             'ArrayInsideHashtable2'
+            ''
             @{
                 EvenDeeper = 'Yes, it''s deep!'
             }
