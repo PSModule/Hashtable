@@ -76,14 +76,15 @@
     $levelIndent = $indent * $IndentLevel
 
     foreach ($key in $Hashtable.Keys) {
-        Write-Verbose "Processing key: $key"
+        Write-Verbose "Processing key: [$key]"
         $value = $Hashtable[$key]
-        Write-Verbose "Processing value: $value"
+        Write-Verbose "Processing value: [$value]"
         if ($null -eq $value) {
             Write-Verbose "Value type: `$null"
+            $lines += "$levelIndent$key = `$null"
             continue
         }
-        Write-Verbose "Value type: $($value.GetType().Name)"
+        Write-Verbose "Value type: [$($value.GetType().Name)]"
         if (($value -is [System.Collections.Hashtable]) -or ($value -is [System.Collections.Specialized.OrderedDictionary])) {
             $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
             $lines += "$levelIndent$key = $nestedString"

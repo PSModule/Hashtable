@@ -271,12 +271,14 @@
                     Key1 = 'Value1'
                     Key2 = 123
                     Key3 = @{}
+                    Key4 = $null
                 }
                 $expected = @'
 @{
     Key1 = 'Value1'
     Key2 = 123
     Key3 = @{}
+    Key4 = $null
 }
 '@.TrimEnd()
 
@@ -292,6 +294,9 @@
                     Key2 = [ordered]@{
                         NestedKey1 = 'NestedValue1'
                         NestedKey2 = 'NestedValue2'
+                        NestedKey3 = @{}
+                        NestedKey4 = $null
+                        NestedKey5 = ''
                     }
                 }
                 $expected = @'
@@ -300,6 +305,9 @@
     Key2 = @{
         NestedKey1 = 'NestedValue1'
         NestedKey2 = 'NestedValue2'
+        NestedKey3 = @{}
+        NestedKey4 = $null
+        NestedKey5 = ''
     }
 }
 '@.TrimEnd()
@@ -388,6 +396,7 @@
                         SubKey2 = @(
                             'ArrayInsideHashtable1'
                             'ArrayInsideHashtable2'
+                            ''
                             @{
                                 EvenDeeper = "Yes, it's deep!"
                             }
@@ -404,6 +413,7 @@
     StringKey = 'Hello ''PowerShell''!'
     NumberKey = 42
     BooleanKey = $true
+    NullKey = $null
     ArrayKey = @(
         'FirstItem'
         123
@@ -425,6 +435,7 @@
         SubKey2 = @(
             'ArrayInsideHashtable1'
             'ArrayInsideHashtable2'
+            ''
             @{
                 EvenDeeper = 'Yes, it''s deep!'
             }
