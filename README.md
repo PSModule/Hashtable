@@ -1,53 +1,109 @@
-# {{ NAME }}
+# Hashtable
 
-{{ DESCRIPTION }}
+Hashtable is a comprehensive module that provides functions for working with PowerShell hashtables.
+It enables you to convert hashtables to PSCustomObjects and vice versa, format hashtables into readable PowerShell
+code, merge hashtables with override support, and remove entries based on specific criteria. This collection of
+utilities is designed to simplify complex hashtable manipulations and help automate your PowerShell workflows.
 
 ## Prerequisites
 
-This uses the following external resources:
-- The [PSModule framework](https://github.com/PSModule) for building, testing and publishing the module.
+This module uses the following external resources:
+- The [PSModule framework](https://github.com/PSModule) for building, testing, and publishing the module.
 
 ## Installation
 
 To install the module from the PowerShell Gallery, you can use the following command:
 
 ```powershell
-Install-PSResource -Name {{ NAME }}
-Import-Module -Name {{ NAME }}
+Install-PSResource -Name Hashtable
+Import-Module -Name Hashtable
 ```
 
 ## Usage
 
-Here is a list of example that are typical use cases for the module.
+Below are some examples illustrating typical use cases for the module.
 
-### Example 1: Greet an entity
+### Example 1: Converting a Hashtable to a PSCustomObject
 
-Provide examples for typical commands that a user would like to do with the module.
-
-```powershell
-Greet-Entity -Name 'World'
-Hello, World!
-```
-
-### Example 2
-
-Provide examples for typical commands that a user would like to do with the module.
+This example demonstrates how to convert a nested hashtable into a PSCustomObject, making it easier to manipulate and explore your data.
 
 ```powershell
-Import-Module -Name PSModuleTemplate
+$hashtable = @{
+    Name    = 'Alice'
+    Age     = 30
+    Contact = @{
+        Email = 'alice@example.com'
+        Phone = '123-456-7890'
+    }
+}
+
+$object = $hashtable | ConvertFrom-Hashtable
+$object | Format-List
 ```
 
-### Find more examples
+### Example 2: Merging Hashtables
 
-To find more examples of how to use the module, please refer to the [examples](examples) folder.
+Merge a default settings hashtable with user-specified overrides. In this example, the values in the override hashtable
+replace those in the main hashtable.
 
-Alternatively, you can use the Get-Command -Module 'This module' to find more commands that are available in the module.
-To find examples of each of the commands you can use Get-Help -Examples 'CommandName'.
+```powershell
+$defaultSettings = @{
+    Theme    = 'Light'
+    Language = 'en'
+    Layout   = 'Standard'
+}
+$userSettings = @{
+    Theme  = 'Dark'
+    Layout = 'Compact'
+}
+
+$mergedSettings = $defaultSettings | Merge-Hashtable -Overrides $userSettings
+$mergedSettings
+```
+
+### Example 3: Formatting a Hashtable as PowerShell Code
+
+Convert a hashtable into a nicely formatted PowerShell code representation. This is especially useful for exporting
+configurations to a `.psd1` file.
+
+```powershell
+$configuration = @{
+    Server      = 'localhost'
+    Port        = 8080
+    Credentials = @{
+        Username = 'admin'
+        Password = 'P@ssw0rd'
+    }
+    Enabled     = $true
+}
+
+$formattedConfig = $configuration | Format-Hashtable
+Write-Output $formattedConfig
+```
+
+### Example 4: Removing Hashtable Entries Based on Criteria
+
+Remove specific entries from a hashtable, such as keys with null or empty values, or those matching a particular name.
+
+```powershell
+$ht = @{
+    ValidKey  = 'SomeValue'
+    EmptyKey  = ''
+    RemoveMe  = 'Unwanted'
+}
+
+# Remove entries with null or empty values and keys named 'RemoveMe'
+$ht | Remove-HashtableEntry -NullOrEmptyValues -Keys 'RemoveMe'
+$ht
+```
+
+For more examples, please refer to the [examples](examples) folder. You can also use `Get-Command -Module 'Hashtable'` to
+list available commands, and `Get-Help -Examples <CommandName>` to view command-specific examples.
 
 ## Documentation
 
-Link to further documentation if available, or describe where in the repository users can find more detailed documentation about
-the module's functions and features.
+Detailed documentation for each function is available via inline help. For more extensive documentation, please check the
+[docs](docs) folder or visit the online documentation at [PSModule Documentation](https://psmodule.io).
 
 ## Contributing
 
@@ -55,15 +111,10 @@ Coder or not, you can contribute to the project! We welcome all contributions.
 
 ### For Users
 
-If you don't code, you still sit on valuable information that can make this project even better. If you experience that the
-product does unexpected things, throw errors or is missing functionality, you can help by submitting bugs and feature requests.
-Please see the issues tab on this project and submit a new issue that matches your needs.
+If you don't code, your feedback is invaluable. If you encounter issues, unexpected behaviors, or missing functionality,
+please submit a bug report or feature request via the project's issues page.
 
 ### For Developers
 
-If you do code, we'd love to have your contributions. Please read the [Contribution guidelines](CONTRIBUTING.md) for more information.
-You can either help by picking up an existing issue or submit a new one if you have an idea for a new feature or improvement.
-
-## Acknowledgements
-
-Here is a list of people and projects that helped this project in some way.
+If you code, we'd love to see your contributions. Please review the [Contribution Guidelines](CONTRIBUTING.md) for more details.
+You can start by picking up an existing issue or submitting a new one if you have an idea for a new feature or improvement.
