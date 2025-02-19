@@ -1,4 +1,4 @@
-﻿function Import-Hashtable {
+﻿filter Import-Hashtable {
     <#
         .SYNOPSIS
         Imports a hashtable from a specified file.
