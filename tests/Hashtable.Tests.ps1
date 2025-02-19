@@ -570,12 +570,14 @@
             }
 
             Export-Hashtable -Hashtable $hashtable -Path $Path
-
+            Write-Verbose (Get-Content -Path $Path) -Verbose
             $result = Test-Path -Path $path
             $result | Should -Be $true
         }
         It 'Imports a <Extension> file at <Path> to a hashtable' -ForEach $testData {
             $hashtable = Import-Hashtable -Path $Path
+
+            Write-Verbose ($hashtable | Format-Hashtable) -Verbose
 
             $hashtable | Should -BeOfType [hashtable]
             $hashtable.StringKey | Should -Be "Hello 'PowerShell'!"
@@ -585,8 +587,8 @@
             $hashtable.ArrayKey[0] | Should -Be 'FirstItem'
             $hashtable.ArrayKey[1] | Should -Be 123
             $hashtable.ArrayKey[2] | Should -Be $false
-            $hashtable.ArrayKey[3][0] | Should -Be 'NestedArray1'
-            $hashtable.ArrayKey[3][1] | Should -Be 'NestedArray2'
+            $hashtable.ArrayKey[3] | Should -Be 'NestedArray1'
+            $hashtable.ArrayKey[4] | Should -Be 'NestedArray2'
             $hashtable.ArrayKey[4].NestedHashtableKey1 | Should -Be 'NestedValue1'
             $hashtable.ArrayKey[4].NestedHashtableKey2[0].DeepNestedKey | Should -Be 'DeepValue'
             $hashtable.ArrayKey[4].NestedHashtableKey2[1] | Should -Be 999
