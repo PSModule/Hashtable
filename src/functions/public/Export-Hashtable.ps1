@@ -27,7 +27,10 @@
         Exports the hashtable as a JSON file.
 
         .OUTPUTS
-        System.Void. This function does not return an output. It writes the exported data to a file.
+        void
+
+        .NOTES
+        This function does not return an output. It writes the exported data to a file.
 
         .LINK
         https://psmodule.io/Export/Functions/Export-Hashtable/

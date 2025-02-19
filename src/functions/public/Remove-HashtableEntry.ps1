@@ -42,7 +42,10 @@
         Removes the key 'Age' from the hashtable.
 
         .OUTPUTS
-        System.Void. The function modifies the input hashtable but does not return output.
+        void
+
+        .NOTES
+        The function modifies the input hashtable but does not return output.
 
         .LINK
         https://psmodule.io/Hashtable/Functions/Remove-HashtableEntry/
