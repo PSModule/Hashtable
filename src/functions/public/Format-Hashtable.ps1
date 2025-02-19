@@ -84,7 +84,9 @@
             continue
         }
         Write-Verbose "Value type: $($value.GetType().Name)"
-        if (($value -is [System.Collections.Hashtable]) -or ($value -is [System.Collections.Specialized.OrderedDictionary])) {
+        if ($null -eq $value) {
+            $lines += "$levelIndent$key = `$null"
+        } elseif (($value -is [System.Collections.Hashtable]) -or ($value -is [System.Collections.Specialized.OrderedDictionary])) {
             $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
             $lines += "$levelIndent$key = $nestedString"
         } elseif ($value -is [System.Management.Automation.PSCustomObject]) {
