@@ -255,16 +255,28 @@
     }
 
     Describe 'Format-Hashtable' {
+        Context 'An empty hashtable' {
+            It 'returns an empty hashtable string' {
+                $ht = @{}
+                $expected = '@{}'
+
+                $result = Format-Hashtable -Hashtable $ht
+                $result | Should -Be $expected
+            }
+        }
+
         Context 'Simple Hashtable' {
             It 'formats a simple hashtable correctly' {
                 $ht = [ordered]@{
                     Key1 = 'Value1'
                     Key2 = 123
+                    Key3 = @{}
                 }
                 $expected = @'
 @{
     Key1 = 'Value1'
     Key2 = 123
+    Key3 = @{}
 }
 '@.TrimEnd()
 
