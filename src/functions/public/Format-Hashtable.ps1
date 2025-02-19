@@ -65,6 +65,11 @@
         [int] $IndentLevel = 1
     )
 
+    # If the hashtable is empty, return '@{}' immediately.
+    if ($Hashtable -is [System.Collections.IDictionary] -and $Hashtable.Count -eq 0) {
+        return '@{}'
+    }
+
     $indent = '    '
     $lines = @()
     $lines += '@{'
