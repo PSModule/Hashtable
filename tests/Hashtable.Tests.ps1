@@ -532,9 +532,9 @@
 
     Describe 'Export/Import-Hashtable' {
         $testData = @(
-            @{ Path = '$HOME/config.psd1'; Extension = '.psd1' }
-            @{ Path = '$HOME/config.ps1'; Extension = '.ps1' }
-            @{ Path = '$HOME/config.json'; Extension = '.json' }
+            @{ Path = "$HOME/config.psd1"; Extension = '.psd1' }
+            @{ Path = "$HOME/config.ps1"; Extension = '.ps1' }
+            @{ Path = "$HOME/config.json"; Extension = '.json' }
         )
 
         It 'Exports a hashtable to a <Extension> file at <Path>' -ForEach $testData {
