@@ -413,6 +413,7 @@
     StringKey = 'Hello ''PowerShell''!'
     NumberKey = 42
     BooleanKey = $true
+    NullKey = $null
     ArrayKey = @(
         'FirstItem'
         123
