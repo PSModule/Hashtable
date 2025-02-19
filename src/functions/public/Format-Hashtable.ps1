@@ -47,7 +47,7 @@
         Useful for serialization and exporting hashtables to files.
 
         .LINK
-        https://psmodule.io/Format/Functions/Format-Hashtable
+        https://psmodule.io/Hashtable/Functions/Format-Hashtable
     #>
     [OutputType([string])]
     [CmdletBinding()]
