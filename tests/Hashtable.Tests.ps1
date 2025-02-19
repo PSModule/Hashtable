@@ -570,14 +570,14 @@
             }
 
             Export-Hashtable -Hashtable $hashtable -Path $Path
-            Write-Verbose (Get-Content -Path $Path) -Verbose
+            Write-Verbose (Get-Content -Path $Path | Out-String) -Verbose
             $result = Test-Path -Path $path
             $result | Should -Be $true
         }
         It 'Imports a <Extension> file at <Path> to a hashtable' -ForEach $testData {
             $hashtable = Import-Hashtable -Path $Path
 
-            Write-Verbose ($hashtable | Format-Hashtable) -Verbose
+            Write-Verbose ($hashtable | Format-Hashtable | Out-String) -Verbose
 
             $hashtable | Should -BeOfType [hashtable]
             $hashtable.StringKey | Should -Be "Hello 'PowerShell'!"
