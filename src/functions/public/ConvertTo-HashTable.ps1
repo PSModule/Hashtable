@@ -49,7 +49,7 @@
         converting complex nested structures recursively.
 
         .LINK
-        https://psmodule.io/ConvertTo/Functions/ConvertTo-Hashtable
+        https://psmodule.io/Hashtable/Functions/ConvertTo-Hashtable
     #>
     [OutputType([hashtable])]
     [CmdletBinding()]

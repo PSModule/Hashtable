@@ -1,38 +1,51 @@
 ﻿filter Remove-HashtableEntry {
     <#
         .SYNOPSIS
-        Removes specific entries from a hashtable based on value, type, or name.
+        Removes specific entries from a hashtable based on given criteria.
 
         .DESCRIPTION
-        This version applies keep filters with the highest precedence. If a key
-        qualifies based on the provided Keep parameters (KeepTypes and/or KeepKeys),
-        it is preserved no matter what removal conditions might say.
-
-        If no keep filters are provided, the function applies removal conditions:
-        - NullOrEmptyValues: Remove keys with null or empty values.
-        - RemoveTypes: Remove keys whose values are of the specified type(s).
-        - RemoveKeys: Remove keys with the specified name(s).
-
-        When Keep filters are provided, only keys that match ALL specified keep criteria
-        will be preserved; keys that do not match are removed regardless of removal settings.
-
-        At the end, the original hashtable is cleared and repopulated with the filtered results.
+        This function filters out entries from a hashtable based on different conditions. You can remove keys with
+        null or empty values, keys of a specific type, or keys matching certain names. It also allows keeping entries
+        based on the opposite criteria. If the `-All` parameter is used, all entries in the hashtable will be removed.
 
         .EXAMPLE
-        $ht = @{
-            KeepThis   = 'Value1'
-            RemoveThis = 'Delete'
-            Other      = 42
-        }
-        $ht | Remove-HashtableEntry -KeepKeys 'KeepThis' -RemoveKeys 'RemoveThis'
+        $myHashtable = @{ Name = 'John'; Age = 30; Country = $null }
+        $myHashtable | Remove-HashtableEntry -NullOrEmptyValues
 
-        This will keep only the key "KeepThis", regardless of other removal flags.
+        Output:
+        ```powershell
+        @{ Name = 'John'; Age = 30 }
+        ```
+
+        Removes entries with null or empty values from the hashtable.
+
+        .EXAMPLE
+        $myHashtable = @{ Name = 'John'; Age = 30; Active = $true }
+        $myHashtable | Remove-HashtableEntry -Types 'Boolean'
+
+        Output:
+        ```powershell
+        @{ Name = 'John'; Age = 30 }
+        ```
+
+        Removes entries where the value type is Boolean.
+
+        .EXAMPLE
+        $myHashtable = @{ Name = 'John'; Age = 30; Country = 'USA' }
+        $myHashtable | Remove-HashtableEntry -Keys 'Age'
+
+        Output:
+        ```powershell
+        @{ Name = 'John'; Country = 'USA' }
+        ```
+
+        Removes the key 'Age' from the hashtable.
 
         .OUTPUTS
-        hashtable
+        System.Void. The function modifies the input hashtable but does not return output.
 
-        .NOTES
-        The function modifies the input hashtable in place.
+        .LINK
+        https://psmodule.io/Hashtable/Functions/Remove-HashtableEntry/
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions', '',

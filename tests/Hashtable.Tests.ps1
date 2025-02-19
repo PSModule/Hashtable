@@ -529,4 +529,72 @@
             }
         }
     }
+
+    Describe 'Export/Import-Hashtable' {
+        $testData = @(
+            @{ Path = '$HOME/config.psd1'; Extension = '.psd1' }
+            @{ Path = '$HOME/config.ps1'; Extension = '.ps1' }
+            @{ Path = '$HOME/config.json'; Extension = '.json' }
+        )
+
+        It 'Exports a hashtable to a <Extension> file at <Path>' -ForEach $testData {
+            $hashtable = [ordered]@{
+                StringKey       = "Hello 'PowerShell'!"
+                NumberKey       = 42
+                BooleanKey      = $true
+                NullKey         = $null
+                ArrayKey        = @(
+                    'FirstItem'
+                    123
+                    $false
+                    @('NestedArray1', 'NestedArray2')
+                    [ordered]@{
+                        NestedHashtableKey1 = 'NestedValue1'
+                        NestedHashtableKey2 = @(
+                            @{ DeepNestedKey = 'DeepValue' }
+                            999
+                        )
+                    }
+                )
+                NestedHashtable = [ordered]@{
+                    SubKey1 = 'SubValue1'
+                    SubKey2 = @(
+                        'ArrayInsideHashtable1'
+                        'ArrayInsideHashtable2'
+                        ''
+                        @{
+                            EvenDeeper = "Yes, it's deep!"
+                        }
+                    )
+                }
+            }
+
+            Export-Hashtable -Hashtable $hashtable -Path $Path
+
+            $result = Test-Path -Path $path
+            $result | Should -Be $true
+        }
+        It 'Imports a <Extension> file at <Path> to a hashtable' -ForEach $testData {
+            $hashtable = Import-Hashtable -Path $Path
+
+            $hashtable | Should -BeOfType [hashtable]
+            $hashtable.StringKey | Should -Be "Hello 'PowerShell'!"
+            $hashtable.NumberKey | Should -Be 42
+            $hashtable.BooleanKey | Should -Be $true
+            $hashtable.NullKey | Should -Be $null
+            $hashtable.ArrayKey[0] | Should -Be 'FirstItem'
+            $hashtable.ArrayKey[1] | Should -Be 123
+            $hashtable.ArrayKey[2] | Should -Be $false
+            $hashtable.ArrayKey[3][0] | Should -Be 'NestedArray1'
+            $hashtable.ArrayKey[3][1] | Should -Be 'NestedArray2'
+            $hashtable.ArrayKey[4].NestedHashtableKey1 | Should -Be 'NestedValue1'
+            $hashtable.ArrayKey[4].NestedHashtableKey2[0].DeepNestedKey | Should -Be 'DeepValue'
+            $hashtable.ArrayKey[4].NestedHashtableKey2[1] | Should -Be 999
+            $hashtable.NestedHashtable.SubKey1 | Should -Be 'SubValue1'
+            $hashtable.NestedHashtable.SubKey2[0] | Should -Be 'ArrayInsideHashtable1'
+            $hashtable.NestedHashtable.SubKey2[1] | Should -Be 'ArrayInsideHashtable2'
+            $hashtable.NestedHashtable.SubKey2[2] | Should -Be ''
+            $hashtable.NestedHashtable.SubKey2[3].EvenDeeper | Should -Be "Yes, it's deep!"
+        }
+    }
 }
