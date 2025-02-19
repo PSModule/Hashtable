@@ -410,11 +410,11 @@
                 # Assert - Define the expected output
                 $expectedOutput = @'
 @{
-    StringKey = 'Hello ''PowerShell''!'
-    NumberKey = 42
-    BooleanKey = $true
-    NullKey = $null
-    ArrayKey = @(
+    StringKey       = 'Hello ''PowerShell''!'
+    NumberKey       = 42
+    BooleanKey      = $true
+    NullKey         = $null
+    ArrayKey        = @(
         'FirstItem'
         123
         $false
