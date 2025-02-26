@@ -88,50 +88,62 @@
             continue
         }
         Write-Verbose "Value type: [$($value.GetType().Name)]"
-        if (($value -is [System.Collections.IDictionary])) {
+        if ($value -is [System.Collections.IDictionary]) {
+            # Nested hashtable
             $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
             $lines += "$levelIndent$paddedKey = $nestedString"
         } elseif ($value -is [System.Management.Automation.PSCustomObject]) {
+            # PSCustomObject => Convert to hashtable & recurse
             $nestedString = $value | ConvertTo-Hashtable | Format-Hashtable -IndentLevel ($IndentLevel + 1)
             $lines += "$levelIndent$paddedKey = $nestedString"
-        } elseif ($value -is [System.Management.Automation.PSObject]) {
-            $nestedString = $value | ConvertTo-Hashtable | Format-Hashtable -IndentLevel ($IndentLevel + 1)
-            $lines += "$levelIndent$paddedKey = $nestedString"
-        } elseif ($value -is [bool]) {
-            $lines += "$levelIndent$paddedKey = `$$($value.ToString().ToLower())"
-        } elseif ($value -is [int] -or $value -is [double]) {
+        } elseif ( $value -is [bool] -or $value -is [System.Management.Automation.SwitchParameter] ) {
+            $boolValue = [bool]$value
+            $lines += "$levelIndent$paddedKey = `$$($boolValue.ToString().ToLower())"
+        } elseif ($value -is [int] -or $value -is [long] -or $value -is [double] -or $value -is [decimal]) {
             $lines += "$levelIndent$paddedKey = $value"
-        } elseif ($value -is [array]) {
+        } elseif ($value -is [System.Collections.IList]) {
+            # This covers normal arrays, ArrayList, List<T>, etc.
             if ($value.Count -eq 0) {
                 $lines += "$levelIndent$paddedKey = @()"
             } else {
                 $lines += "$levelIndent$paddedKey = @("
-                $arrayIndent = $levelIndent + $indent  # Increase indentation for elements inside @(...)
+                $arrayIndent = $levelIndent + $indent
 
-                $value | ForEach-Object {
-                    $nestedValue = $_
-                    Write-Verbose "Processing array element: $_"
-                    Write-Verbose "Element type: $($_.GetType().Name)"
-                    if (($nestedValue -is [System.Collections.Hashtable]) -or ($nestedValue -is [System.Collections.Specialized.OrderedDictionary])) {
+                foreach ($nestedValue in $value) {
+                    Write-Verbose "Processing array element: [$nestedValue]"
+                    Write-Verbose "Element type: [$($nestedValue.GetType().Name)]"
+
+                    if (($nestedValue -is [System.Collections.IDictionary])) {
+                        # Nested hashtable
                         $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 2)
                         $lines += "$arrayIndent$nestedString"
-                    } elseif ($nestedValue -is [bool]) {
-                        $lines += "$arrayIndent`$$($nestedValue.ToString().ToLower())"
-                    } elseif ($nestedValue -is [int]) {
+                    } elseif ($nestedValue -is [System.Management.Automation.PSCustomObject]) {
+                        # PSCustomObject => Convert to hashtable & recurse
+                        $nestedString = $nestedValue | ConvertTo-Hashtable | Format-Hashtable -IndentLevel ($IndentLevel + 2)
+                        $lines += "$arrayIndent$nestedString"
+                    } elseif ( $nestedValue -is [bool] -or $nestedValue -is [System.Management.Automation.SwitchParameter] ) {
+                        $boolValue = [bool]$nestedValue
+                        $lines += "$arrayIndent`$$($boolValue.ToString().ToLower())"
+                    } elseif ($nestedValue -is [int] -or $nestedValue -is [long] -or $nestedValue -is [double] -or $nestedValue -is [decimal]) {
                         $lines += "$arrayIndent$nestedValue"
                     } else {
-                        $lines += "$arrayIndent'$nestedValue'"
+                        # Fallback => treat as string (escape single-quotes)
+                        $escapedElement = $nestedValue -replace "('+)", "''"
+                        $lines += "$arrayIndent'$escapedElement'"
                     }
                 }
-                $arrayIndent = $levelIndent
-                $lines += "$arrayIndent)"
+
+                $lines += ($levelIndent + ')')
             }
         } else {
-            $value = $value -replace "('+)", "''" # Escape single quotes in a manifest file
-            $lines += "$levelIndent$paddedKey = '$value'"
+            # Fallback: treat as string (escaping single-quotes)
+            $escapedValue = $value -replace "('+)", "''"
+            $lines += "$levelIndent$paddedKey = '$escapedValue'"
         }
     }
+
     $levelIndent = $indent * ($IndentLevel - 1)
     $lines += "$levelIndent}"
+
     return $lines -join [Environment]::NewLine
 }
