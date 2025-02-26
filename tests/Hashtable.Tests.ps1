@@ -413,9 +413,17 @@
                         AnArrayOfHashtables = @(
                             [ordered]@{
                                 Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Tests.ps1'
-                                Data = [pscustomobject]@{
-                                    Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
-                                }
+                                Data = @(
+                                    [pscustomobject]@{
+                                        Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
+                                    },
+                                    [pscustomobject]@{
+                                        Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
+                                    },
+                                    [pscustomobject]@{
+                                        Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
+                                    }
+                                )
                             },
                             [ordered]@{
                                 Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Sheep\Sheep.Tests.ps1'
@@ -479,9 +487,17 @@
         AnArrayOfHashtables = @(
             @{
                 Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Tests.ps1'
-                Data = @{
-                    Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
-                }
+                Data = @(
+                    @{
+                        Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
+                    }
+                    @{
+                        Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
+                    }
+                    @{
+                        Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
+                    }
+                )
             }
             @{
                 Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Sheep\Sheep.Tests.ps1'
