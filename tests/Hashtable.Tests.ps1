@@ -208,7 +208,7 @@
     }
 
     Describe 'ConvertFrom-Hashtable' {
-        Get-Context 'ConvertFrom-Hashtable - simple usage' {
+        Context 'ConvertFrom-Hashtable - simple usage' {
             It 'ConvertFrom-Hashtable - converts a flat hashtable to PSCustomObject' {
                 $hashtable = @{ Name = 'John Doe'; Age = 30 }
                 $result = $hashtable | ConvertFrom-Hashtable
@@ -219,7 +219,7 @@
             }
         }
 
-        Get-Context 'ConvertFrom-Hashtable - nested hashtable conversion' {
+        Context 'ConvertFrom-Hashtable - nested hashtable conversion' {
             It 'ConvertFrom-Hashtable - correctly converts nested hashtables' {
                 $hashtable = @{ Address = @{ Street = '123 Main St'; City = 'Somewhere' } }
                 $result = $hashtable | ConvertFrom-Hashtable
@@ -231,7 +231,7 @@
             }
         }
 
-        Get-Context 'ConvertFrom-Hashtable - array of hashtables' {
+        Context 'ConvertFrom-Hashtable - array of hashtables' {
             It 'ConvertFrom-Hashtable - converts an array of hashtables to objects' {
                 $hashtable = @{ Employees = @(@{ Name = 'Alice' }, @{ Name = 'Bob' }) }
                 $result = $hashtable | ConvertFrom-Hashtable
@@ -244,7 +244,7 @@
             }
         }
 
-        Get-Context 'ConvertFrom-Hashtable - empty hashtable' {
+        Context 'ConvertFrom-Hashtable - empty hashtable' {
             It 'ConvertFrom-Hashtable - returns an empty PSCustomObject when input is empty' {
                 $result = @{} | ConvertFrom-Hashtable
 
@@ -255,7 +255,7 @@
     }
 
     Describe 'Format-Hashtable' {
-        Get-Context 'An empty hashtable' {
+        Context 'An empty hashtable' {
             It 'returns an empty hashtable string' {
                 $ht = @{}
                 $expected = '@{}'
@@ -265,7 +265,7 @@
             }
         }
 
-        Get-Context 'Simple Hashtable' {
+        Context 'Simple Hashtable' {
             It 'formats a simple hashtable correctly' {
                 $ht = [ordered]@{
                     Key1 = 'Value1'
@@ -287,7 +287,7 @@
             }
         }
 
-        Get-Context 'Nested Hashtable' {
+        Context 'Nested Hashtable' {
             It 'formats a nested hashtable correctly' {
                 $ht = [ordered]@{
                     Key1 = 'Value1'
@@ -317,7 +317,7 @@
             }
         }
 
-        Get-Context 'Hashtable with Array' {
+        Context 'Hashtable with Array' {
             It 'formats a hashtable containing an array correctly' {
                 $ht = @{
                     Key3 = @(1, 2, 3)
@@ -337,7 +337,7 @@
             }
         }
 
-        Get-Context 'Hashtable with Boolean' {
+        Context 'Hashtable with Boolean' {
             It 'formats boolean values correctly' {
                 $ht = @{
                     Key4 = $true
@@ -353,7 +353,7 @@
             }
         }
 
-        Get-Context 'Escaping Single Quotes' {
+        Context 'Escaping Single Quotes' {
             It 'escapes single quotes in string values' {
                 $ht = @{
                     Key5 = "O'Reilly"
@@ -370,7 +370,7 @@
             }
         }
 
-        Get-Context 'A complex hashtable structure' {
+        Context 'A complex hashtable structure' {
             It 'Should correctly format a complex nested hashtable' {
                 # Arrange - Define the complex test hashtable
                 $testHashtable = [ordered]@{
@@ -497,7 +497,7 @@
     }
 
     Describe 'Remove-HashtableEntry' {
-        Get-Context 'Remove-HashtableEntry - NullOrEmptyValues' {
+        Context 'Remove-HashtableEntry - NullOrEmptyValues' {
             It 'Removes keys with null or empty values' {
                 $Hashtable = @{
                     'Key1' = 'Value1'
@@ -514,7 +514,7 @@
             }
         }
 
-        Get-Context 'Remove-HashtableEntry - RemoveTypes' {
+        Context 'Remove-HashtableEntry - RemoveTypes' {
             It 'Removes keys with specified value types' {
                 $Hashtable = @{
                     'Key1' = 'Value1'
@@ -531,7 +531,7 @@
             }
         }
 
-        Get-Context 'Remove-HashtableEntry - RemoveNames' {
+        Context 'Remove-HashtableEntry - RemoveNames' {
             It 'Removes specific keys by name' {
                 $Hashtable = @{
                     'KeepThis'   = 'Value'
@@ -544,7 +544,7 @@
             }
         }
 
-        Get-Context 'Remove-HashtableEntry - KeepTypes' {
+        Context 'Remove-HashtableEntry - KeepTypes' {
             It 'Removes keys not of specified types' {
                 $Hashtable = @{
                     'Key1' = 'Value1'
@@ -561,7 +561,7 @@
             }
         }
 
-        Get-Context 'Remove-HashtableEntry - KeepNames' {
+        Context 'Remove-HashtableEntry - KeepNames' {
             It 'Removes keys not matching specified names' {
                 $Hashtable = @{
                     'KeepThis'   = 'Value'
