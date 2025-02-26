@@ -128,7 +128,7 @@
             }
         } else {
             $value = $value -replace "('+)", "''" # Escape single quotes in a manifest file
-            $lines += "$levelIndent$paddedKey = '$value'"
+            $lines += "$levelIndent$paddedKey = '$($value.ToString())'"
         }
     }
     $levelIndent = $indent * ($IndentLevel - 1)
