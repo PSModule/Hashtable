@@ -99,7 +99,7 @@
         } elseif ( $value -is [bool] -or $value -is [System.Management.Automation.SwitchParameter] ) {
             $boolValue = [bool]$value
             $lines += "$levelIndent$paddedKey = `$$($boolValue.ToString().ToLower())"
-        } elseif ([System.Management.Automation.LanguagePrimitives]::IsNumeric($value.GetType())) {
+        } elseif ($value -is [int] -or $value -is [long] -or $value -is [double] -or $value -is [decimal]) {
             $lines += "$levelIndent$paddedKey = $value"
         } elseif ($value -is [System.Collections.IList]) {
             # This covers normal arrays, ArrayList, List<T>, etc.
@@ -119,7 +119,7 @@
                     } elseif ( $nestedValue -is [bool] -or $nestedValue -is [System.Management.Automation.SwitchParameter] ) {
                         $boolValue = [bool]$nestedValue
                         $lines += "$arrayIndent`$$($boolValue.ToString().ToLower())"
-                    } elseif ([System.Management.Automation.LanguagePrimitives]::IsNumeric($value.GetType())) {
+                    } elseif ($nestedValue -is [int] -or $nestedValue -is [long] -or $nestedValue -is [double] -or $nestedValue -is [decimal]) {
                         $lines += "$arrayIndent$nestedValue"
                     } else {
                         # Fallback => treat as string (escape single-quotes)
