@@ -401,7 +401,7 @@
                                 EvenDeeper = "Yes, it's deep!"
                             }
                         )
-                        Data    = [pscustomobject]@{
+                        Data    = [ordered]@{
                             Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Tests.ps1'
                             Data = [pscustomobject]@{
                                 Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
