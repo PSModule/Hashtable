@@ -437,7 +437,7 @@
 
                 # Act - Run the function
                 $formatted = Format-Hashtable -Hashtable $testHashtable
-
+                Write-Verbose $formatted -Verbose
                 # Assert - Define the expected output
                 $expectedOutput = @'
 @{
@@ -510,6 +510,7 @@
 }
 
 '@.Trim() # Trim to remove any unintended whitespace
+                Write-Verbose $expectedOutput -Verbose
 
                 # Compare function output to expected output
                 $formatted | Should -BeExactly $expectedOutput
