@@ -63,7 +63,7 @@
         [int] $IndentLevel = 1
     )
 
-    # If this is null, just return "@{}" to avoid errors
+    # If the hashtable is empty, return '@{}' immediately.
     if ($Hashtable.Count -eq 0) {
         return '@{}'
     }

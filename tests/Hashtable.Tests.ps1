@@ -402,22 +402,22 @@
                             }
                         )
                     }
-                    Run             = @{
+                    Run             = [ordered]@{
                         ABoolean            = $true
                         AString             = 'Hello'
                         AnArray             = @('One', 'Two', 'Three')
-                        AnObject            = @{
+                        AnObject            = [ordered]@{
                             NestedKey1 = 'NestedValue1'
                             NestedKey2 = 'NestedValue2'
                         }
                         AnArrayOfHashtables = @(
-                            @{
+                            [ordered]@{
                                 Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Tests.ps1'
                                 Data = @{
                                     Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
                                 }
                             },
-                            @{
+                            [ordered]@{
                                 Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Sheep\Sheep.Tests.ps1'
                                 Data = @{
                                     Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Sheep\Sheep.Data.ps1'
@@ -465,6 +465,7 @@
         )
     }
     Run             = @{
+        ABoolean            = $true
         AString             = 'Hello'
         AnArray             = @(
             'One'
@@ -475,19 +476,23 @@
             NestedKey1 = 'NestedValue1'
             NestedKey2 = 'NestedValue2'
         }
-        ABoolean            = $true
         AnArrayOfHashtables = @(
             @{
-                Key2 = 'Value2'
-                Key1 = 'Value1'
+                Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Tests.ps1'
+                Data = @{
+                    Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Planets\Planets.Data.ps1'
+                }
             }
             @{
-                Key4 = 'Value4'
-                Key3 = 'Value3'
+                Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Sheep\Sheep.Tests.ps1'
+                Data = @{
+                    Path = 'C:\Repos\GitHub\PSModule\Action\Invoke-Pester\tests\3-Advanced\Sheep\Sheep.Data.ps1'
+                }
             }
         )
     }
 }
+
 '@.Trim() # Trim to remove any unintended whitespace
 
                 # Compare function output to expected output
