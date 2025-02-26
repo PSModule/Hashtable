@@ -56,7 +56,7 @@
             ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
-        [object] $Hashtable,
+        [System.Collections.IDictionary] $Hashtable,
 
         # The indentation level for formatting nested structures.
         [Parameter()]
@@ -64,7 +64,7 @@
     )
 
     # If the hashtable is empty, return '@{}' immediately.
-    if ($Hashtable -is [System.Collections.IDictionary] -and $Hashtable.Count -eq 0) {
+    if ($Hashtable.Count -eq 0) {
         return '@{}'
     }
 
@@ -88,14 +88,14 @@
             continue
         }
         Write-Verbose "Value type: [$($value.GetType().Name)]"
-        if (($value -is [System.Collections.Hashtable]) -or ($value -is [System.Collections.Specialized.OrderedDictionary])) {
+        if (($value -is [System.Collections.IDictionary])) {
             $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
             $lines += "$levelIndent$paddedKey = $nestedString"
         } elseif ($value -is [System.Management.Automation.PSCustomObject]) {
-            $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
+            $nestedString = $value | ConvertTo-Hashtable | Format-Hashtable -IndentLevel ($IndentLevel + 1)
             $lines += "$levelIndent$paddedKey = $nestedString"
         } elseif ($value -is [System.Management.Automation.PSObject]) {
-            $nestedString = Format-Hashtable -Hashtable $value -IndentLevel ($IndentLevel + 1)
+            $nestedString = $value | ConvertTo-Hashtable | Format-Hashtable -IndentLevel ($IndentLevel + 1)
             $lines += "$levelIndent$paddedKey = $nestedString"
         } elseif ($value -is [bool]) {
             $lines += "$levelIndent$paddedKey = `$$($value.ToString().ToLower())"
