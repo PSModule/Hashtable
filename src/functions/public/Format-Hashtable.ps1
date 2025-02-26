@@ -114,7 +114,12 @@
                     Write-Verbose "Element type: [$($nestedValue.GetType().Name)]"
 
                     if (($nestedValue -is [System.Collections.IDictionary])) {
+                        # Nested hashtable
                         $nestedString = Format-Hashtable -Hashtable $nestedValue -IndentLevel ($IndentLevel + 2)
+                        $lines += "$arrayIndent$nestedString"
+                    } elseif ($nestedValue -is [System.Management.Automation.PSCustomObject]) {
+                        # PSCustomObject => Convert to hashtable & recurse
+                        $nestedString = $nestedValue | ConvertTo-Hashtable | Format-Hashtable -IndentLevel ($IndentLevel + 2)
                         $lines += "$arrayIndent$nestedString"
                     } elseif ( $nestedValue -is [bool] -or $nestedValue -is [System.Management.Automation.SwitchParameter] ) {
                         $boolValue = [bool]$nestedValue
