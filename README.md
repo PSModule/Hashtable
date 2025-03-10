@@ -1,6 +1,5 @@
 # Hashtable
 
-
 Hashtable is a comprehensive module that provides functions for working with PowerShell hashtables.
 It enables you to convert hashtables to PSCustomObjects and vice versa, format hashtables into readable PowerShell
 code, merge hashtables with override support, and remove entries based on specific criteria. This collection of
