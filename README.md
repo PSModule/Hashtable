@@ -101,7 +101,7 @@ You can use `Get-Command -Module 'Hashtable'` to list available commands, and `G
 
 ## Documentation
 
-Detailed documentation for each function is available via inline help. For more extensive documentation, please visit the 
+Detailed documentation for each function is available via inline help. For more extensive documentation, please visit the
 [Hashtable docs](https://psmodule.io/Hashtable/) or [PSModule Docs](https://psmodule.io/docs).
 
 ## Contributing
