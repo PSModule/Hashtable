@@ -97,13 +97,12 @@ $ht | Remove-HashtableEntry -NullOrEmptyValues -Keys 'RemoveMe'
 $ht
 ```
 
-For more examples, please refer to the [examples](examples) folder. You can also use `Get-Command -Module 'Hashtable'` to
-list available commands, and `Get-Help -Examples <CommandName>` to view command-specific examples.
+You can use `Get-Command -Module 'Hashtable'` to list available commands, and `Get-Help -Examples <CommandName>` to view command-specific examples.
 
 ## Documentation
 
-Detailed documentation for each function is available via inline help. For more extensive documentation, please check the
-[docs](docs) folder or visit the online documentation at [PSModule Documentation](https://psmodule.io).
+Detailed documentation for each function is available via inline help. For more extensive documentation, please visit the
+[Hashtable docs](https://psmodule.io/Hashtable/) or [PSModule Docs](https://psmodule.io/docs).
 
 ## Contributing
 
