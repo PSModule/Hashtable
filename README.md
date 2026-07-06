@@ -21,7 +21,7 @@ Use PowerShell help and command discovery for module details:
 
 ```powershell
 Get-Command -Module Hashtable
-Get-Help ConvertTo-HashTable -Examples
+Get-Help ConvertTo-Hashtable -Examples
 ```
 
 ## Contributing
