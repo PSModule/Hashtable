@@ -11,6 +11,8 @@ Install-PSResource -Name Hashtable
 Import-Module -Name Hashtable
 ```
 
+If your environment still uses PowerShellGet, install the module with `Install-Module -Name Hashtable` instead.
+
 ## Documentation
 
 Documentation is published at [psmodule.io/Hashtable](https://psmodule.io/Hashtable/).
@@ -19,7 +21,7 @@ Use PowerShell help and command discovery for module details:
 
 ```powershell
 Get-Command -Module Hashtable
-Get-Help <CommandName> -Examples
+Get-Help 'CommandName' -Examples
 ```
 
 ## Contributing
