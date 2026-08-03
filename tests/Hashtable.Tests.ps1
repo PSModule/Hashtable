@@ -1,4 +1,6 @@
-﻿Describe 'Module' {
+﻿#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '6.0.0'; MaximumVersion = '6.*' }
+
+Describe 'Module' {
     Describe 'Merge-Hashtable' {
         It 'Merges two hashtable' {
             $Main = @{
