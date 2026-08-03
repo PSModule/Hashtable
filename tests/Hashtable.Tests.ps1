@@ -1,5 +1,19 @@
-﻿Describe 'Module' {
+﻿#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '6.0.0'; MaximumVersion = '6.*' }
+
+Describe 'Module' {
     Describe 'Merge-Hashtable' {
+        It 'Merges into an empty hashtable' {
+            $Main = @{}
+            $Override = @{
+                Key1 = 'Value1'
+                Key2 = 'Value2'
+            }
+            $Result = Merge-Hashtable -Main $Main -Overrides $Override
+
+            $Result.Key1 | Should -Be 'Value1'
+            $Result.Key2 | Should -Be 'Value2'
+        }
+
         It 'Merges two hashtable' {
             $Main = @{
                 Action   = ''
